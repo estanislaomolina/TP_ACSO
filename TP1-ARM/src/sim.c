@@ -24,6 +24,8 @@ void process_instruction()
     // Print the instruction in hexadecimal format
     printf("Executing instruction: 0x%08X\n", instruction);
 
+    
+
     RUN_BIT = FALSE;
     printf("Simulator halted\n\n");
 
