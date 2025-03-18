@@ -42,14 +42,31 @@ void process_instruction()
             // Implementación de SUB aquí
             break;
         
-        case 0x758:  // ADDS
+        case 0x758:  // ADDS (extended register)
             printf("ADDS instruction\n");
-            // Implementación de ADDS aquí
+            uint8_t rd = instruction & 0x1F;          // Bits [4:0]
+            uint8_t rn = (instruction >> 5) & 0x1F;  // Bits [9:5]
+            uint8_t rm = (instruction >> 16) & 0x1F; // Bits [20:16]
+            
+            NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] + CURRENT_STATE.REGS[rm];
+            
+            // Actualizar flags
+            NEXT_STATE.FLAG_Z = (NEXT_STATE.REGS[rd] == 0);
+            NEXT_STATE.FLAG_N = (NEXT_STATE.REGS[rd] < 0);
+            break;
             break;
         
-        case 0x758:  // SUBS
+        case 0x759:  // SUBS (extended register)
             printf("SUBS instruction\n");
-            // Implementación de SUBS aquí
+            uint8_t rd = instruction & 0x1F;          // Bits [4:0]
+            uint8_t rn = (instruction >> 5) & 0x1F;  // Bits [9:5]
+            uint8_t rm = (instruction >> 16) & 0x1F; // Bits [20:16]
+            
+            NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] - CURRENT_STATE.REGS[rm];
+            
+            // Actualizar flags
+            NEXT_STATE.FLAG_Z = (NEXT_STATE.REGS[rd] == 0);
+            NEXT_STATE.FLAG_N = (NEXT_STATE.REGS[rd] < 0);
             break;
         
         case 0x550:  // MUL
