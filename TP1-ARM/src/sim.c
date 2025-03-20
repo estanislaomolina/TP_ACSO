@@ -31,137 +31,29 @@ void process_instruction()
             printf("HLT: Halting simulation.\n");
             RUN_BIT = 0;
             break;
+        
+        case 0x588: // adds
+            NEXT_STATE.REGS[(instruction >> 0) & 0x1F] = CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] + CURRENT_STATE.REGS[(instruction >> 16) & 0x1F];
+            break;
 
-        case 0x458:  // ADD
-            printf("ADD instruction\n");
-            // Implementación de ADD aquí
+        case 0x558: // adds
+            NEXT_STATE.REGS[(instruction >> 0) & 0x1F] = CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] + (instruction & 0x3FF);
             break;
-        
-        case 0x659:  // SUB
-            printf("SUB instruction\n");
-            // Implementación de SUB aquí
+
+        case 0x750: // ands
+            NEXT_STATE.REGS[(instruction >> 0) & 0x1F] = CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] & CURRENT_STATE.REGS[(instruction >> 16) & 0x1F];
             break;
-        
-        case 0x758:  // ADDS (extended register)
-            printf("ADDS instruction\n");
-            uint8_t rd = instruction & 0x1F;          // Bits [4:0]
-            uint8_t rn = (instruction >> 5) & 0x1F;  // Bits [9:5]
-            uint8_t rm = (instruction >> 16) & 0x1F; // Bits [20:16]
-            
-            NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] + CURRENT_STATE.REGS[rm];
-            
-            // Actualizar flags
-            NEXT_STATE.FLAG_Z = (NEXT_STATE.REGS[rd] == 0);
-            NEXT_STATE.FLAG_N = (NEXT_STATE.REGS[rd] < 0);
+
+        case 0x758: //subs
+            NEXT_STATE.REGS[(instruction >> 0) & 0x1F] = CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] - CURRENT_STATE.REGS[(instruction >> 16) & 0x1F];
             break;
-            break;
-        
-        case 0x759:  // SUBS (extended register)
-            printf("SUBS instruction\n");
-            uint8_t rd = instruction & 0x1F;          // Bits [4:0]
-            uint8_t rn = (instruction >> 5) & 0x1F;  // Bits [9:5]
-            uint8_t rm = (instruction >> 16) & 0x1F; // Bits [20:16]
-            
-            NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] - CURRENT_STATE.REGS[rm];
-            
-            // Actualizar flags
-            NEXT_STATE.FLAG_Z = (NEXT_STATE.REGS[rd] == 0);
-            NEXT_STATE.FLAG_N = (NEXT_STATE.REGS[rd] < 0);
-            break;
-        
-        case 0x550:  // MUL
-            printf("MUL instruction\n");
-            // Implementación de MUL aquí
-            break;
-        
-        case 0x450:  // ANDS
-            printf("ANDS instruction\n");
-            // Implementación de ANDS aquí
-            break;
-        
-        case 0x650:  // ORR
-            printf("ORR instruction\n");
-            // Implementación de ORR aquí
-            break;
-        
-        case 0x750:  // EOR
-            printf("EOR instruction\n");
-            // Implementación de EOR aquí
-            break;
-        
-        case 0x6B0:  // CMP
-            printf("CMP instruction\n");
-            // Implementación de CMP aquí
-            break;
-        
-        case 0x0A0:  // B (Branch)
-            printf("B instruction\n");
-            // Implementación de B aquí
-            break;
-        
-        case 0x6F0:  // BR (Branch Register)
-            printf("BR instruction\n");
-            // Implementación de BR aquí
-            break;
-        
-        case 0x5A0:  // CBZ (Compare and Branch on Zero)
-            printf("CBZ instruction\n");
-            // Implementación de CBZ aquí
-            break;
-        
-        case 0x5A8:  // CBNZ (Compare and Branch on Non-Zero)
-            printf("CBNZ instruction\n");
-            // Implementación de CBNZ aquí
-            break;
-        
-        case 0x7C2:  // STUR
-            printf("STUR instruction\n");
-            // Implementación de STUR aquí
-            break;
-        
-        case 0x7C0:  // STURB
-            printf("STURB instruction\n");
-            // Implementación de STURB aquí
-            break;
-        
-        case 0x7C1:  // STURH
-            printf("STURH instruction\n");
-            // Implementación de STURH aquí
-            break;
-        
-        case 0x5C2:  // LDUR
-            printf("LDUR instruction\n");
-            // Implementación de LDUR aquí
-            break;
-        
-        case 0x5C0:  // LDURB
-            printf("LDURB instruction\n");
-            // Implementación de LDURB aquí
-            break;
-        
-        case 0x5C1:  // LDURH
-            printf("LDURH instruction\n");
-            // Implementación de LDURH aquí
-            break;
-        
-        case 0x69A:  // LSL
-            printf("LSL instruction\n");
-            // Implementación de LSL aquí
-            break;
-        
-        case 0x69B:  // LSR
-            printf("LSR instruction\n");
-            // Implementación de LSR aquí
-            break;
-        
-        case 0x528:  // MOVZ
-            printf("MOVZ instruction\n");
-            // Implementación de MOVZ aquí
-            break;
+
         
         default:
             printf("Unknown instruction with opcode: 0x%X\n", opcode);
             break;
+
+        
     }
 
 }
