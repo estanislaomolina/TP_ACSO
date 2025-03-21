@@ -6,6 +6,8 @@
 #include <stdint.h>  // Para tipos de datos como uint64_t
 #include "shell.h"   // Incluye la definición de CPU_State y otras estructuras
 
+
+
 void process_instruction()
 {
 
@@ -48,7 +50,55 @@ void process_instruction()
             NEXT_STATE.REGS[(instruction >> 0) & 0x1F] = CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] - CURRENT_STATE.REGS[(instruction >> 16) & 0x1F];
             break;
 
+        case 0x2A0: // beq
+            if (CURRENT_STATE.FLAG_Z == 1) {
+                NEXT_STATE.PC = CURRENT_STATE.PC + (instruction & 0x3FFFFFF) * 4;
+            }
+            break;
+
+        case 0x650: // eors
+            NEXT_STATE.REGS[(instruction >> 0) & 0x1F] = CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] ^ CURRENT_STATE.REGS[(instruction >> 16) & 0x1F];
+            break;
+
+        case 0x694: // movz (creo que mov tambien)
+            NEXT_STATE.REGS[(instruction >> 0) & 0x1F] = (instruction >> 5) & 0xFFFF;
+            break;
+
+        case 0x69B: // lsl
+            NEXT_STATE.REGS[(instruction >> 0) & 0x1F] = CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] << (instruction & 0x3F);
+            break;
+
+        case 0x7C0: // stur
+            mem_write_32(CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] + (instruction & 0xFFF), CURRENT_STATE.REGS[(instruction >> 0) & 0x1F]);
+            break;
         
+        case 0x1C0: // sturb
+            // Adaptación para escribir 8 bits usando mem_write_32
+            {
+                uint64_t address = CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] + (instruction & 0xFFF);
+                uint32_t value = mem_read_32(address);
+                value = (value & 0xFFFFFF00) | (CURRENT_STATE.REGS[(instruction >> 0) & 0x1F] & 0xFF);
+                mem_write_32(address, value);
+            }
+            break;
+
+        case 0x7C2: // ldur
+            NEXT_STATE.REGS[(instruction >> 0) & 0x1F] = mem_read_32(CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] + (instruction & 0xFFF));
+            break;
+
+        case 0x1C2: // ldurb
+            // Adaptación para leer 8 bits usando mem_read_32
+            {
+                uint64_t address = CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] + (instruction & 0xFFF);
+                uint32_t value = mem_read_32(address);
+                NEXT_STATE.REGS[(instruction >> 0) & 0x1F] = value & 0xFF;
+            }
+            break;
+        
+        case 0x788: // subs
+            NEXT_STATE.REGS[(instruction >> 0) & 0x1F] = CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] - (instruction & 0xFFF);
+            break;
+
         default:
             printf("Unknown instruction with opcode: 0x%X\n", opcode);
             break;
