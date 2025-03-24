@@ -158,8 +158,6 @@ void process_instruction()
         default:
             printf("Unknown instruction with opcode: 0x%X\n", opcode);
             break;
-
-        
     }
 
 }
