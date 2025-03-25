@@ -99,8 +99,25 @@ void subs_ext(uint32_t instr) {
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
 }
 
-void ands(uint32_t rd, uint32_t rn, uint32_t rm){
-    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] & CURRENT_STATE.REGS[rm];
+void ands(uint32_t instr) {
+    // Extraer los campos de la instrucción
+    uint8_t rd = (instr >> 0) & 0x1F;  // Registro destino
+    uint8_t rn = (instr >> 5) & 0x1F;  // Registro fuente
+    uint8_t rm = (instr >> 16) & 0x1F;  // Registro fuente 2
+
+    // Obtener el valor del registro fuente
+    uint64_t operand1 = CURRENT_STATE.REGS[rn];
+    uint64_t operand2 = CURRENT_STATE.REGS[rm];
+    
+    // Realizar la operación AND
+    uint64_t result = operand1 & operand2;
+    
+    // Almacenar el resultado en el registro destino
+    NEXT_STATE.REGS[rd] = result;
+    
+    // Actualizar los flags NZ
+    NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
+    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
 }
 
 void beq(uint32_t imm26){
@@ -182,7 +199,7 @@ void process_instruction()
             break;
 
         case 0x750: // ands
-            NEXT_STATE.REGS[(instruction >> 0) & 0x1F] = CURRENT_STATE.REGS[(instruction >> 5) & 0x1F] & CURRENT_STATE.REGS[(instruction >> 16) & 0x1F];
+            ands(instruction);
             break;
 
         case 0x758: //subs extended
