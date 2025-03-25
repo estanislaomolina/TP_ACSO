@@ -11,12 +11,49 @@ void hlt(){
     RUN_BIT = 0;
 }
 
-void adds_imm(uint32_t rd, uint32_t rn, uint32_t imm12){
-    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] + imm12;
+void adds_imm(uint32_t instr) {
+    // Extraer los campos de la instrucción
+    uint8_t rd = (instr >> 0) & 0x1F;  // Registro destino
+    uint8_t rn = (instr >> 5) & 0x1F;  // Registro fuente
+    uint16_t imm = (instr >> 10) & 0xFFF;  // Inmediato de 12 bits
+
+    // Obtener el valor del registro fuente
+    uint64_t operand1 = CURRENT_STATE.REGS[rn];
+    uint64_t operand2 = imm;
+    
+    // Realizar la suma
+    uint64_t result = operand1 + operand2;
+    
+    // Almacenar el resultado en el registro destino
+    NEXT_STATE.REGS[rd] = result;
+    
+    // Actualizar los flags NZCV
+    NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
+    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
 }
 
-void adds_ext(uint32_t rd, uint32_t rn, uint32_t imm12){
-    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] + imm12;
+
+
+void adds_ext(uint32_t instr){
+    // Extraer los campos de la instrucción
+    uint8_t rd = (instr >> 0) & 0x1F;  // Registro destino
+    uint8_t rn = (instr >> 5) & 0x1F;  // Registro fuente
+    uint8_t rm = (instr >> 16) & 0x1F;  // Registro fuente 2
+    uint8_t shamt = (instr >> 10) & 0x3F;  // Cantidad de bits a rotar
+
+    // Obtener el valor del registro fuente
+    uint64_t operand1 = CURRENT_STATE.REGS[rn];
+    uint64_t operand2 = CURRENT_STATE.REGS[rm] << shamt;
+    
+    // Realizar la suma
+    uint64_t result = operand1 + operand2;
+    
+    // Almacenar el resultado en el registro destino
+    NEXT_STATE.REGS[rd] = result;
+    
+    // Actualizar los flags NZCV
+    NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
+    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
 }
 
 void subs_imm(uint32_t rd, uint32_t rn, uint32_t imm12){
@@ -102,11 +139,11 @@ void process_instruction()
             break;
         
         case 0x588: // adds immediate
-            adds_imm((instruction >> 0) & 0x1F, (instruction >> 5) & 0x1F, instruction & 0xFFF);
+            adds_imm(instruction);
             break;
 
         case 0x558: // adds extended
-            adds_ext((instruction >> 0) & 0x1F, (instruction >> 5) & 0x1F, instruction & 0xFFF);
+            adds_ext(instruction);
             break;
 
         case 0x750: // ands
