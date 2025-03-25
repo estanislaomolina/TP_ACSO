@@ -1,4 +1,3 @@
-
 Current register/bus values :
 -------------------------------------
 Instruction Count : 4
@@ -39,3 +38,4 @@ X31: 0x0
 FLAG_N: 1
 FLAG_Z: 0
 
+ARM-SIM> 
