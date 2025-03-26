@@ -206,39 +206,39 @@ void process_instruction()
             subs_ext(instruction);
             break;
 
-        case 0x2A0: // beq
-            if (CURRENT_STATE.FLAG_Z == 1) {
-                NEXT_STATE.PC = CURRENT_STATE.PC + (instruction & 0x3FFFFFF) * 4;
-            }
-            break;
+        // case 0x2A0: // beq
+        //     if (CURRENT_STATE.FLAG_Z == 1) {
+        //         NEXT_STATE.PC = CURRENT_STATE.PC + (instruction & 0x3FFFFFF) * 4;
+        //     }
+        //     break;
 
-        case 0x650: // eors
-            eors((instruction >> 0) & 0x1F, (instruction >> 5) & 0x1F, (instruction >> 16) & 0x1F);
-            break;
+        // case 0x650: // eors
+        //     eors((instruction >> 0) & 0x1F, (instruction >> 5) & 0x1F, (instruction >> 16) & 0x1F);
+        //     break;
 
-        case 0x694: // movz (creo que mov tambien)
-            movz((instruction >> 0) & 0x1F, instruction & 0xFFFF);
-            break;
+        // case 0x694: // movz (creo que mov tambien)
+        //     movz((instruction >> 0) & 0x1F, instruction & 0xFFFF);
+        //     break;
 
-        case 0x69B: // lsl
-            void lsl(uint32_t rd, uint32_t rn, uint32_t shamt);
-            break;
+        // case 0x69B: // lsl
+        //     void lsl(uint32_t rd, uint32_t rn, uint32_t shamt);
+        //     break;
 
-        case 0x7C0: // stur
-            void stur(uint32_t rt, uint32_t rn, uint32_t imm12);
-            break;
+        // case 0x7C0: // stur
+        //     void stur(uint32_t rt, uint32_t rn, uint32_t imm12);
+        //     break;
         
-        case 0x1C0: // sturb
-            void sturb(uint32_t rt, uint32_t rn, uint32_t imm12);
-            break;
+        // case 0x1C0: // sturb
+        //     void sturb(uint32_t rt, uint32_t rn, uint32_t imm12);
+        //     break;
 
-        case 0x7C2: // ldur
-            void ldur(uint32_t rt, uint32_t rn, uint32_t imm12);
-            break;
+        // case 0x7C2: // ldur
+        //     void ldur(uint32_t rt, uint32_t rn, uint32_t imm12);
+        //     break;
 
-        case 0x1C2: // ldurb
-            void ldurb(uint32_t rt, uint32_t rn, uint32_t imm12);
-            break;
+        // case 0x1C2: // ldurb
+        //     void ldurb(uint32_t rt, uint32_t rn, uint32_t imm12);
+        //     break;
         
         case 0x788: // subs immediate
             subs_imm(instruction);
