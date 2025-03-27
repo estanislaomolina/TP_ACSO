@@ -16,10 +16,10 @@ void hlt(){
 void adds_imm(uint32_t instr) {
     // Extraer los campos de la instrucción
 
-    u_int8_t rd = extract_bits(instr, 0, 4);
-    u_int8_t rn = extract_bits(instr, 5, 9);
-    u_int16_t imm12 = extract_bits(instr, 10, 21);
-    u_int8_t shift = extract_bits(instr, 22, 23);
+    uint8_t rd = extract_bits(instr, 0, 4);
+    uint8_t rn = extract_bits(instr, 5, 9);
+    uint16_t imm12 = extract_bits(instr, 10, 21);
+    uint8_t shift = extract_bits(instr, 22, 23);
     
 
     // Obtener el valor del registro fuente
