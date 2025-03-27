@@ -154,16 +154,20 @@ void orr(uint32_t instr){
     NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] | CURRENT_STATE.REGS[rm];
 }
 
-void b(uint32_t instr){
-    // Extraer los campos de la instrucción
-    uint8_t imm26 = (instr >> 0) & 0x3FFFFFF;  // Inmediato de 26 bits
+void b(uint32_t instr) {
+    // Extract the 26-bit immediate value (imm26)
+    int32_t imm26 = (instr >> 0) & 0x3FFFFFF;  // Immediate value (bits [25:0])
 
-    // Calcular la dirección de salto
-    uint64_t offset = imm26 << 2;
-    uint64_t target = CURRENT_STATE.PC + offset;
+    // Perform sign extension for the 26-bit immediate value
+    if (imm26 & (1 << 25)) { // Check if the 26th bit (sign bit) is set
+        imm26 |= 0xFC000000; // Sign-extend to 32 bits
+    }
 
-    // Saltar a la dirección
-    NEXT_STATE.PC = target;
+    // Calculate the branch offset (shift left by 2 as per ARM spec)
+    int32_t offset = imm26 << 2;
+
+    // Update the Program Counter (PC) to the branch target
+    NEXT_STATE.PC = CURRENT_STATE.PC + offset;
 }
 
 void br(uint32_t instr){
@@ -273,8 +277,17 @@ void bcond(uint32_t instr){
 }
 
 
-void movz(uint32_t rd, uint32_t imm16){
-    NEXT_STATE.REGS[rd] = imm16;
+void movz(uint32_t instr) {
+    // Extract the 5-bit destination register (rd), 16-bit immediate value (imm16), and shift
+    uint8_t rd = (instr >> 0) & 0x1F;  // Destination register
+    uint16_t imm16 = (instr >> 5) & 0xFFFF;  // Immediate value (bits [20:5])
+    uint8_t shift = (instr >> 21) & 0b11;  // Shift amount (bits [22:21])
+
+    // Shift the immediate value by (shift * 16) bits
+    uint64_t value = (uint64_t)imm16 << (shift * 16);
+
+    // Store the value in the destination register
+    NEXT_STATE.REGS[rd] = value;
 }
 
 void lsl(uint32_t rd, uint32_t rn, uint32_t shamt){
@@ -306,4 +319,28 @@ void ldurb(uint32_t rt, uint32_t rn, uint32_t imm12){
         uint32_t value = mem_read_32(address);
         NEXT_STATE.REGS[rt] = value & 0xFF;
     }
+}
+
+void cbz(uint32_t instr) {
+    // Extract the 5-bit register (rt) and 19-bit immediate value (imm19)
+    uint8_t rt = (instr >> 0) & 0x1F;  // Test register
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Immediate value (bits [23:5])
+
+    // Perform sign extension for the 19-bit immediate value
+    if (imm19 & (1 << 18)) { // Check if the 19th bit (sign bit) is set
+        imm19 |= 0xFFF80000; // Sign-extend to 32 bits
+    }
+
+    // Calculate the branch offset (shift left by 2 as per ARM spec)
+    int32_t offset = imm19 << 2;
+
+    // Check if the register value is zero
+    if (CURRENT_STATE.REGS[rt] == 0) {
+        // Update the Program Counter (PC) to the branch target
+        NEXT_STATE.PC = CURRENT_STATE.PC + offset;
+    } else {
+        // If the condition is not met, increment PC to the next instruction
+        NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+    }
+
 }

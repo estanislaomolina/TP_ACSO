@@ -23,7 +23,9 @@ void blt(uint32_t instr);
 void ble(uint32_t instr);
 void bcond(uint32_t instr);
 
-void movz(uint32_t rd, uint32_t imm16);
+void movz(uint32_t instr);
+
+void cbz(uint32_t instr);
 
 
 void lsl(uint32_t rd, uint32_t rn, uint32_t shamt);

@@ -19,6 +19,9 @@ const instruction_t instructions_list[] = {
     {eors, 0b11001010},
     {orr, 0b10101010},
     {bcond, 0b01010100},
+    {movz, 0b11010010},
+    {cbz, 0b10110100},
+    {b, 0b00010111}
 };
 
 
