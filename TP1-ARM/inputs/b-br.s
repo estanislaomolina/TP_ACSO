@@ -1,5 +1,5 @@
 .text
-mov X5, #foo
+mov X5, [foo]
 br X5
 adds X2, X0, 10
 
