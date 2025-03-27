@@ -174,19 +174,6 @@ void br(uint32_t instr){
     NEXT_STATE.PC = CURRENT_STATE.REGS[rn];
 }
 
-// void beq(uint32_t instr) {
-//     // Extract the 4-bit immediate value after the first 8 bits opcode
-//     uint8_t cond = (instr >> 0) & 0xF;
-
-//     // Extract the 19-bit immediate value after the first 8 bits opcode
-//     uint8_t imm19 = (instr >> 5) & 0x7FFFF;
-//     // Calculate the jump address
-
-//     uint64_t offset = imm19 << 2;
-//     uint64_t target = CURRENT_STATE.PC + offset;
-
-// }
-
 void beq(uint32_t instr) {
     // Extract the 19-bit immediate value (bits [23:5])
     int32_t imm19 = (instr >> 5) & 0x7FFFF;
@@ -263,7 +250,7 @@ void bcond(uint32_t instr){
     }
 
     // Saltar a la dirección
-    NEXT_STATE.PC = target;
+    //NEXT_STATE.PC = target;
 }
 
 

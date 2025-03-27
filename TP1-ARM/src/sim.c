@@ -18,7 +18,7 @@ const instruction_t instructions_list[] = {
     {ands, 0b11101010},
     {eors, 0b11001010},
     {orr, 0b10101010},
-    {beq, 0b01010100}
+    {bcond, 0b01010100},
 };
 
 
