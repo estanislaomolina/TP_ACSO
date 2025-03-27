@@ -5,168 +5,23 @@
 
 #include <stdint.h>  // Para tipos de datos como uint64_t
 #include "shell.h"   // Incluye la definición de CPU_State y otras estructuras
+#include "./instructions/sim_instructions.h"
+#include "sim.h"
+#include "utils.h"
 
-void hlt(){
-    printf("HLT: Halting simulation.\n");
-    RUN_BIT = 0;
-}
-
-void adds_imm(uint32_t instr) {
-    // Extraer los campos de la instrucción
-    uint8_t rd = (instr >> 0) & 0x1F;  // Registro destino
-    uint8_t rn = (instr >> 5) & 0x1F;  // Registro fuente
-    uint16_t imm = (instr >> 10) & 0xFFF;  // Inmediato de 12 bits
-
-    // Obtener el valor del registro fuente
-    uint64_t operand1 = CURRENT_STATE.REGS[rn];
-    uint64_t operand2 = imm;
-    
-    // Realizar la suma
-    uint64_t result = operand1 + operand2;
-    
-    // Almacenar el resultado en el registro destino
-    NEXT_STATE.REGS[rd] = result;
-    
-    // Actualizar los flags NZCV
-    NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
-    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
-}
+const instruction_t instructions_list[] = {
+    {hlt, 0b11010100},
+    {adds_imm, 0b10110001},
+    {adds_ext, 0b10101011},
+    {subs_imm, 0b11110001},
+    {subs_ext, 0b11101011},
+    {ands, 0b11101010},
+    {eors, 0b11001010},
+    {orr, 0b10101010}
+};
 
 
-
-void adds_ext(uint32_t instr){
-    // Extraer los campos de la instrucción
-    uint8_t rd = (instr >> 0) & 0x1F;  // Registro destino
-    uint8_t rn = (instr >> 5) & 0x1F;  // Registro fuente
-    uint8_t rm = (instr >> 16) & 0x1F;  // Registro fuente 2
-    uint8_t shamt = (instr >> 10) & 0x3F;  // Cantidad de bits a rotar
-
-    // Obtener el valor del registro fuente
-    uint64_t operand1 = CURRENT_STATE.REGS[rn];
-    uint64_t operand2 = CURRENT_STATE.REGS[rm] << shamt;
-    
-    // Realizar la suma
-    uint64_t result = operand1 + operand2;
-    
-    // Almacenar el resultado en el registro destino
-    NEXT_STATE.REGS[rd] = result;
-    
-    // Actualizar los flags NZCV
-    NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
-    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
-}
-
-void subs_imm(uint32_t instr) {
-    // Extraer los campos de la instrucción
-    uint8_t rd = (instr >> 0) & 0x1F;  // Registro destino
-    uint8_t rn = (instr >> 5) & 0x1F;  // Registro fuente
-    uint16_t imm = (instr >> 10) & 0xFFF;  // Inmediato de 12 bits
-
-    // Obtener el valor del registro fuente
-    uint64_t operand1 = CURRENT_STATE.REGS[rn];
-    uint64_t operand2 = imm;
-    
-    // Realizar la resta
-    uint64_t result = operand1 - operand2;
-    
-    // Almacenar el resultado en el registro destino
-    NEXT_STATE.REGS[rd] = result;
-    
-    // Actualizar los flags NZCV
-    NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
-    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
-}
-
-void subs_ext(uint32_t instr) {
-    // Extraer los campos de la instrucción
-    uint8_t rd = (instr >> 0) & 0x1F;  // Registro destino
-    uint8_t rn = (instr >> 5) & 0x1F;  // Registro fuente
-    uint8_t rm = (instr >> 16) & 0x1F;  // Registro fuente 2
-    uint8_t shamt = (instr >> 10) & 0x3F;  // Cantidad de bits a rotar
-
-    // Obtener el valor del registro fuente
-    uint64_t operand1 = CURRENT_STATE.REGS[rn];
-    uint64_t operand2 = CURRENT_STATE.REGS[rm] << shamt;
-    
-    // Realizar la resta
-    uint64_t result = operand1 - operand2;
-    
-    // Almacenar el resultado en el registro destino
-    NEXT_STATE.REGS[rd] = result;
-    
-    // Actualizar los flags NZCV
-    NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
-    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
-}
-
-void ands(uint32_t instr) {
-    // Extraer los campos de la instrucción
-    uint8_t rd = (instr >> 0) & 0x1F;  // Registro destino
-    uint8_t rn = (instr >> 5) & 0x1F;  // Registro fuente
-    uint8_t rm = (instr >> 16) & 0x1F;  // Registro fuente 2
-
-    // Obtener el valor del registro fuente
-    uint64_t operand1 = CURRENT_STATE.REGS[rn];
-    uint64_t operand2 = CURRENT_STATE.REGS[rm];
-    
-    // Realizar la operación AND
-    uint64_t result = operand1 & operand2;
-    
-    // Almacenar el resultado en el registro destino
-    NEXT_STATE.REGS[rd] = result;
-    
-    // Actualizar los flags NZ
-    NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
-    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
-}
-
-void beq(uint32_t imm26){
-    if (CURRENT_STATE.FLAG_Z == 1) {
-        NEXT_STATE.PC = CURRENT_STATE.PC + imm26 * 4;
-    }
-}
-
-void eors(uint32_t rd, uint32_t rn, uint32_t rm){
-    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] ^ CURRENT_STATE.REGS[rm];
-}
-
-void movz(uint32_t rd, uint32_t imm16){
-    NEXT_STATE.REGS[rd] = imm16;
-}
-
-void lsl(uint32_t rd, uint32_t rn, uint32_t shamt){
-    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] << shamt;
-}
-
-void stur(uint32_t rt, uint32_t rn, uint32_t imm12){
-    mem_write_32(CURRENT_STATE.REGS[rn] + imm12, CURRENT_STATE.REGS[rt]);
-}
-
-void sturb(uint32_t rt, uint32_t rn, uint32_t imm12){
-    // Adaptación para escribir 8 bits usando mem_write_32
-    {
-        uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
-        uint32_t value = mem_read_32(address);
-        value = (value & 0xFFFFFF00) | (CURRENT_STATE.REGS[rt] & 0xFF);
-        mem_write_32(address, value);
-    }
-}
-
-void ldur(uint32_t rt, uint32_t rn, uint32_t imm12){
-    NEXT_STATE.REGS[rt] = mem_read_32(CURRENT_STATE.REGS[rn] + imm12);
-}
-
-void ldurb(uint32_t rt, uint32_t rn, uint32_t imm12){
-    // Adaptación para leer 8 bits usando mem_read_32
-    {
-        uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
-        uint32_t value = mem_read_32(address);
-        NEXT_STATE.REGS[rt] = value & 0xFF;
-    }
-}
-
-void process_instruction()
-{
+void process_instruction(){
 
     /* execute one instruction here. You should use CURRENT_STATE and modify
      * values in NEXT_STATE. You can call mem_read_32() and mem_write_32() to
@@ -176,78 +31,24 @@ void process_instruction()
     // Fetch the instruction from memory
     uint32_t instruction = mem_read_32(CURRENT_STATE.PC);
 
-    // Print the instruction in hexadecimal format
-    printf("Executing instruction: 0x%08X\n", instruction);
+    // Print the instruction in binary format
+    printf("Executing instruction: ");
+    print_binary(instruction);
 
-    uint32_t opcode = (instruction >> 21) & 0x7FF;
+    uint32_t opcode = (instruction >> 24) & 0b11111111; // 8 bit opcode
     NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+    uint32_t opcode12 = (instruction >> 20) & 0b111111111111; // 12 bit opcode
+
+    uint8_t opcode6 = (instruction >> 26) & 0b111111; // 6 bit opcode  
 
     // Decodificar y ejecutar la instrucción
     // Los valores de cada case me los tiro el chat. 
     // Se supone que son los opcodes de cada instrucción y los valores se pueden encontrar en TP1-ARM/ref/DDI0487B_a_armv8_arm.pdf
-    switch (opcode) {
-        case 0x6A2:  // HLT (Halt)
-            hlt();
+    for(int i = 0; i < sizeof(instructions_list) / sizeof(instruction_t); i++){
+        if(opcode == instructions_list[i].opcode){
+            instructions_list[i].instruction(instruction);
             break;
-        
-        case 0x588: // adds immediate
-            adds_imm(instruction);
-            break;
-
-        case 0x558: // adds extended
-            adds_ext(instruction);
-            break;
-
-        case 0x750: // ands
-            ands(instruction);
-            break;
-
-        case 0x758: //subs extended
-            subs_ext(instruction);
-            break;
-
-        // case 0x2A0: // beq
-        //     if (CURRENT_STATE.FLAG_Z == 1) {
-        //         NEXT_STATE.PC = CURRENT_STATE.PC + (instruction & 0x3FFFFFF) * 4;
-        //     }
-        //     break;
-
-        // case 0x650: // eors
-        //     eors((instruction >> 0) & 0x1F, (instruction >> 5) & 0x1F, (instruction >> 16) & 0x1F);
-        //     break;
-
-        // case 0x694: // movz (creo que mov tambien)
-        //     movz((instruction >> 0) & 0x1F, instruction & 0xFFFF);
-        //     break;
-
-        // case 0x69B: // lsl
-        //     void lsl(uint32_t rd, uint32_t rn, uint32_t shamt);
-        //     break;
-
-        // case 0x7C0: // stur
-        //     void stur(uint32_t rt, uint32_t rn, uint32_t imm12);
-        //     break;
-        
-        // case 0x1C0: // sturb
-        //     void sturb(uint32_t rt, uint32_t rn, uint32_t imm12);
-        //     break;
-
-        // case 0x7C2: // ldur
-        //     void ldur(uint32_t rt, uint32_t rn, uint32_t imm12);
-        //     break;
-
-        // case 0x1C2: // ldurb
-        //     void ldurb(uint32_t rt, uint32_t rn, uint32_t imm12);
-        //     break;
-        
-        case 0x788: // subs immediate
-            subs_imm(instruction);
-            break;
-
-        default:
-            printf("Unknown instruction with opcode: 0x%X\n", opcode);
-            break;
+        }
     }
-
 }
 
