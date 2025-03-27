@@ -17,7 +17,8 @@ const instruction_t instructions_list[] = {
     {subs_ext, 0b11101011},
     {ands, 0b11101010},
     {eors, 0b11001010},
-    {orr, 0b10101010}
+    {orr, 0b10101010},
+    {bcond, 0b01010100},
 };
 
 
