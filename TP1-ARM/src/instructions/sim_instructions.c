@@ -212,8 +212,25 @@ void bge(uint32_t instr) {
 }
 
 void blt(uint32_t instr) {
-    // Extract the 4-bit immediate value after the first 8 bits opcode
-    uint8_t cond = (instr >> 0) & 0xF;
+    // Extract the 19-bit immediate value (bits [23:5])
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;
+
+    // Perform sign extension for the 19-bit immediate value
+    if (imm19 & (1 << 18)) { // Check if the 19th bit (sign bit) is set
+        imm19 |= 0xFFF80000; // Sign-extend to 32 bits
+    }
+
+    // Calculate the branch offset (shift left by 2 as per ARM spec)
+    int32_t offset = imm19 << 2;
+
+    // Check if the Negative flag (N) is set and Zero flag (Z) is clear
+    if (CURRENT_STATE.FLAG_N == 1 && CURRENT_STATE.FLAG_Z == 0) {
+        // Update the Program Counter (PC) to the branch target
+        NEXT_STATE.PC = CURRENT_STATE.PC + offset;
+    } else {
+        // If the condition is not met, increment PC to the next instruction
+        NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+    }
 }
 
 void ble(uint32_t instr) {
@@ -231,15 +248,17 @@ void bcond(uint32_t instr){
     uint64_t target = CURRENT_STATE.PC + offset;
 
     // Saltar a la dirección si se cumple la condición
+    // Los valores de cond representan los bits [3:0] de la instrucción
+
     if (cond == 0b0000) {  // BEQ
         beq(instr);
     } else if (cond == 0b0001) {  // BNE
         bne(instr);
     } else if (cond == 0b1010) {  // BGT
         bgt(instr);
-    } else if (cond == 0b1011) {  // BGE
+    } else if (cond == 0b1011) {  // BLT
         bge(instr);
-    } else if (cond == 0b1100) {  // BLT
+    } else if (cond == 0b1100) {  // BGE
         blt(instr);
     } else if (cond == 0b1101) {  // BLE
         ble(instr);
