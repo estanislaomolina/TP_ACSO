@@ -2,6 +2,7 @@
     "files.associations": {
         "conditional_instructions.h": "c",
         "stdint.h": "c",
-        "utils.h": "c"
+        "utils.h": "c",
+        "sim_instructions.h": "c"
     }
 }

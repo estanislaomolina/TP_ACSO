@@ -290,35 +290,86 @@ void movz(uint32_t instr) {
     NEXT_STATE.REGS[rd] = value;
 }
 
-void lsl(uint32_t rd, uint32_t rn, uint32_t shamt){
-    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] << shamt;
+void lsl(uint32_t instr) {
+    // Extraer campos de la instrucción
+    uint8_t rd = (instr >> 0) & 0x1F;   // Registro destino
+    uint8_t rn = (instr >> 5) & 0x1F;   // Registro fuente
+    uint32_t imms = extract_bits(instr, 10, 15); // Inmediato de 6 bits
+    uint64_t immr = extract_bits(instr, 16, 21); // Inmediato de 6 bits
+    
+    uint64_t shift = 63 - imms;
+    uint64_t result = CURRENT_STATE.REGS[rn] << shift;
+    NEXT_STATE.REGS[rd] = result;
+    // Actualizar los flags NZCV
+    NEXT_STATE.FLAG_N = (result<0);
+    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
+    NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+
 }
 
-void stur(uint32_t rt, uint32_t rn, uint32_t imm12){
-    mem_write_32(CURRENT_STATE.REGS[rn] + imm12, CURRENT_STATE.REGS[rt]);
+void stur(uint32_t instr) {
+    // Extract fields from instruction
+    uint8_t rt = (instr >> 0) & 0x1F;   // Register to store
+    uint8_t rn = (instr >> 5) & 0x1F;   // Base register
+    uint16_t imm12 = (instr >> 10) & 0xFFF;  // 12-bit immediate offset
+
+    uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
+    mem_write_32(address, CURRENT_STATE.REGS[rt]);
 }
 
-void sturb(uint32_t rt, uint32_t rn, uint32_t imm12){
-    // Adaptación para escribir 8 bits usando mem_write_32
-    {
-        uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
-        uint32_t value = mem_read_32(address);
-        value = (value & 0xFFFFFF00) | (CURRENT_STATE.REGS[rt] & 0xFF);
-        mem_write_32(address, value);
-    }
+void sturb(uint32_t instr) {
+    // Extract fields from instruction
+    uint8_t rt = (instr >> 0) & 0x1F;   // Destination register
+    uint8_t rn = (instr >> 5) & 0x1F;   // Base register
+    uint16_t imm12 = (instr >> 10) & 0xFFF;  // 12-bit immediate offset
+
+    uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
+    uint32_t word = mem_read_32(address & ~0x3);  // Align to 4 bytes
+
+    uint8_t byte_value = CURRENT_STATE.REGS[rt] & 0xFF;
+    uint32_t shift = (address & 0x3) * 8;
+    
+    word = (word & ~(0xFF << shift)) | (byte_value << shift);
+    mem_write_32(address & ~0x3, word);
 }
 
-void ldur(uint32_t rt, uint32_t rn, uint32_t imm12){
+void ldur(uint32_t instr) {
+    // Extract fields
+    uint8_t rt = (instr >> 0) & 0x1F;
+    uint8_t rn = (instr >> 5) & 0x1F;
+    uint16_t imm12 = (instr >> 10) & 0xFFF;
+
     NEXT_STATE.REGS[rt] = mem_read_32(CURRENT_STATE.REGS[rn] + imm12);
 }
 
-void ldurb(uint32_t rt, uint32_t rn, uint32_t imm12){
-    // Adaptación para leer 8 bits usando mem_read_32
-    {
-        uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
-        uint32_t value = mem_read_32(address);
-        NEXT_STATE.REGS[rt] = value & 0xFF;
-    }
+void ldurb(uint32_t instr) {
+    // Extract fields
+    uint8_t rt = (instr >> 0) & 0x1F;
+    uint8_t rn = (instr >> 5) & 0x1F;
+    uint16_t imm12 = (instr >> 10) & 0xFFF;
+
+    uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
+    uint32_t word = mem_read_32(address & ~0x3);  // Align to 4 bytes
+
+    uint32_t shift = (address & 0x3) * 8;
+    NEXT_STATE.REGS[rt] = (word >> shift) & 0xFF;
+}
+
+void mov(uint32_t instr) {
+    // Extract the 5-bit destination register (rd)
+    uint8_t rd = (instr >> 0) & 0x1F;  
+
+    // Extract the 16-bit immediate (imm16)
+    uint16_t imm16 = (instr >> 5) & 0xFFFF;  
+
+    // Extract shift amount (2 bits) to determine where to place imm16
+    uint8_t shift = (instr >> 21) & 0x3;  
+
+    // Apply the shift (shift values are 0, 16, 32, or 48 bits)
+    uint64_t imm = (uint64_t)imm16 << (shift * 16);
+
+    // Load the immediate value into the destination register
+    NEXT_STATE.REGS[rd] = imm;
 }
 
 void cbz(uint32_t instr) {

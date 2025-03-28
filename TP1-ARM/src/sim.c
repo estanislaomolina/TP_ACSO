@@ -10,6 +10,7 @@
 #include "utils.h"
 
 const instruction_t instructions_list[] = {
+    
     {hlt, 0b11010100},
     {adds_imm, 0b10110001},
     {adds_ext, 0b10101011},
@@ -19,9 +20,12 @@ const instruction_t instructions_list[] = {
     {eors, 0b11001010},
     {orr, 0b10101010},
     {bcond, 0b01010100},
-    {movz, 0b11010010},
-    {cbz, 0b10110100},
-    {b, 0b00010111}
+    {stur, 0b11111000},
+    {sturb, 0b00111000},
+    {ldur, 0b11111000},
+    {ldurb, 0b00111000},
+    {lsl, 0b11010011},
+    {mov, 0b11010010}
 };
 
 

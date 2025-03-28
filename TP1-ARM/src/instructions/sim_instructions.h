@@ -28,15 +28,12 @@ void movz(uint32_t instr);
 void cbz(uint32_t instr);
 
 
-void lsl(uint32_t rd, uint32_t rn, uint32_t shamt);
-
-
-void stur(uint32_t rt, uint32_t rn, uint32_t imm12);
-void sturb(uint32_t rt, uint32_t rn, uint32_t imm12);
-
-void ldur(uint32_t rt, uint32_t rn, uint32_t imm12);
-void ldurb(uint32_t rt, uint32_t rn, uint32_t imm12);
-
+void lsl(uint32_t instr);
+void stur(uint32_t instr);
+void sturb(uint32_t instr);
+void ldur(uint32_t instr);
+void ldurb(uint32_t instr);
+void mov(uint32_t instr);
 
 
 
