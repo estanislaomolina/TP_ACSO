@@ -18,3 +18,8 @@ uint32_t extract_bits(uint32_t num, uint8_t start, uint8_t end) {
     }
     return (num & mask) >> start;
 }
+
+int16_t sign_extend(uint32_t value, int bits) {
+    int32_t mask = 1 << (bits - 1);
+    return (value ^ mask) - mask;
+}

@@ -334,12 +334,22 @@ void sturb(uint32_t instr) {
 }
 
 void ldur(uint32_t instr) {
+    printf("LDUR: Loading value from memory.\n");
     // Extract fields
-    uint8_t rt = (instr >> 0) & 0x1F;
-    uint8_t rn = (instr >> 5) & 0x1F;
-    uint16_t imm12 = (instr >> 10) & 0xFFF;
+    uint8_t rt = extract_bits(instr, 0, 4);   // Destination register (e.g., X1)
+    uint8_t rn = extract_bits(instr, 5, 9);   // Base register (e.g., X2)
+    int16_t imm9 = sign_extend(extract_bits(instr, 12, 20), 9); // Sign-extended 9-bit offset
 
-    NEXT_STATE.REGS[rt] = mem_read_32(CURRENT_STATE.REGS[rn] + imm12);
+
+    uint32_t address = CURRENT_STATE.REGS[rn] + imm9;
+
+    
+    uint64_t values = mem_read_32(address + 4);
+    values = values << 32;
+    values |= mem_read_32(address);
+
+    // Store the loaded value into the destination register
+    NEXT_STATE.REGS[rt] = values;
 }
 
 void ldurb(uint32_t instr) {
