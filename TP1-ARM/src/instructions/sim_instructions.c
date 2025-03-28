@@ -303,7 +303,6 @@ void lsl(uint32_t instr) {
     // Actualizar los flags NZCV
     NEXT_STATE.FLAG_N = (result<0);
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
-    NEXT_STATE.PC = CURRENT_STATE.PC + 4;
 
 }
 
@@ -341,12 +340,12 @@ void ldur(uint32_t instr) {
     int16_t imm9 = sign_extend(extract_bits(instr, 12, 20), 9); // Sign-extended 9-bit offset
 
 
-    uint32_t address = CURRENT_STATE.REGS[rn] + imm9;
+    uint32_t address = CURRENT_STATE.REGS[rn] + (imm9 * 8);
 
     
     uint64_t values = mem_read_32(address + 4);
     values = values << 32;
-    values |= mem_read_32(address);
+    values = values | mem_read_32(address);
 
     // Store the loaded value into the destination register
     NEXT_STATE.REGS[rt] = values;
@@ -380,6 +379,7 @@ void mov(uint32_t instr) {
 
     // Load the immediate value into the destination register
     NEXT_STATE.REGS[rd] = imm;
+
 }
 
 void cbz(uint32_t instr) {

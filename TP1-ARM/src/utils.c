@@ -19,7 +19,11 @@ uint32_t extract_bits(uint32_t num, uint8_t start, uint8_t end) {
     return (num & mask) >> start;
 }
 
-int16_t sign_extend(uint32_t value, int bits) {
-    int32_t mask = 1 << (bits - 1);
-    return (value ^ mask) - mask;
-}
+int64_t sign_extend(uint32_t number, int bits) {
+    //if number is negative extends with ones, else extends with zeros 
+    if ((number >> (bits - 1))) {
+      number |= 0xFFFFFFFFFFFFFFFF << bits;
+    }
+  
+    return number;
+  }

@@ -12,6 +12,7 @@
 typedef struct {
     void (*instruction)(uint32_t);
     uint32_t opcode;
+    uint8_t size;
 } instruction_t;
 
 const instruction_t instructions_list[];
