@@ -21,7 +21,7 @@ const instruction_t instructions_list[] = {
     {orr, 0b10101010, 8},
     {bcond, 0b01010100, 8},
     {stur, 0b1111100000, 10},
-    {sturb, 0b00111000, 8},
+    {sturb, 0b0011100000 , 10},
     {ldur, 0b1111100001, 10},
     {ldurb, 0b00111000, 8},
     {lsl, 0b11010011, 8},

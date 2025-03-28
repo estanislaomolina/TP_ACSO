@@ -317,20 +317,29 @@ void stur(uint32_t instr) {
 }
 
 void sturb(uint32_t instr) {
-    // Extract fields from instruction
-    uint8_t rt = (instr >> 0) & 0x1F;   // Destination register
-    uint8_t rn = (instr >> 5) & 0x1F;   // Base register
-    uint16_t imm12 = (instr >> 10) & 0xFFF;  // 12-bit immediate offset
+    printf("STURB: Storing byte to memory.\n");
 
-    uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
-    uint32_t word = mem_read_32(address & ~0x3);  // Align to 4 bytes
+    // Extraer campos de la instrucción
+    uint8_t rt = extract_bits(instr, 0, 4);   // Registro destino (bits 0-4)
+    uint8_t rn = extract_bits(instr, 5, 9);   // Registro base (bits 5-9)
+    int16_t imm9 = sign_extend(extract_bits(instr, 12, 20), 9); // Offset de 9 bits
 
-    uint8_t byte_value = CURRENT_STATE.REGS[rt] & 0xFF;
-    uint32_t shift = (address & 0x3) * 8;
-    
-    word = (word & ~(0xFF << shift)) | (byte_value << shift);
-    mem_write_32(address & ~0x3, word);
+    // Calcular la dirección efectiva
+    uint32_t address = CURRENT_STATE.REGS[rn] + imm9;
+
+    // Obtener el byte a almacenar
+    uint32_t data = CURRENT_STATE.REGS[rt] & 0xFF;
+
+
+
+    uint32_t values = mem_read_32(address);
+    values = values & 0xFFFFFF00;
+    values = values | data;
+
+    // Escribir el byte en memoria
+    mem_write_32(address, values);
 }
+
 
 void ldur(uint32_t instr) {
     printf("LDUR: Loading value from memory.\n");
@@ -340,7 +349,7 @@ void ldur(uint32_t instr) {
     int16_t imm9 = sign_extend(extract_bits(instr, 12, 20), 9); // Sign-extended 9-bit offset
 
 
-    uint32_t address = CURRENT_STATE.REGS[rn] + (imm9 * 8);
+    uint32_t address = CURRENT_STATE.REGS[rn] + imm9;
 
     
     uint64_t values = mem_read_32(address + 4);
@@ -352,16 +361,19 @@ void ldur(uint32_t instr) {
 }
 
 void ldurb(uint32_t instr) {
-    // Extract fields
-    uint8_t rt = (instr >> 0) & 0x1F;
-    uint8_t rn = (instr >> 5) & 0x1F;
-    uint16_t imm12 = (instr >> 10) & 0xFFF;
+    uint8_t rt = extract_bits(instr, 0, 4);   // Destination register (e.g., X1)
+    uint8_t rn = extract_bits(instr, 5, 9);   // Base register (e.g., X2)
+    int16_t imm9 = sign_extend(extract_bits(instr, 12, 20), 9); // Sign-extended 9-bit offset
 
-    uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
-    uint32_t word = mem_read_32(address & ~0x3);  // Align to 4 bytes
 
-    uint32_t shift = (address & 0x3) * 8;
-    NEXT_STATE.REGS[rt] = (word >> shift) & 0xFF;
+    uint32_t address = CURRENT_STATE.REGS[rn] + imm9;
+
+    
+    uint64_t values = mem_read_32(address);
+    values = values & 0xFF;
+
+    // Store the loaded value into the destination register
+    NEXT_STATE.REGS[rt] = values;
 }
 
 void mov(uint32_t instr) {
