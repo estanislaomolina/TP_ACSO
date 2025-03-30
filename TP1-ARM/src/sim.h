@@ -2,14 +2,13 @@
 #include <assert.h>
 #include <string.h>
 
-#include <stdint.h>  // Para tipos de datos como uint64_t
-
+#include <stdint.h>
 
 #ifndef _SIM_H_
 #define _SIM_H_
 
-
-typedef struct {
+typedef struct
+{
     void (*instruction)(uint32_t);
     uint32_t opcode;
     uint8_t size;
