@@ -184,9 +184,32 @@ void br(uint32_t instr){
     // Saltar a la dirección
     NEXT_STATE.PC = CURRENT_STATE.REGS[rn];
 }
+
+void cmp(uint32_t instr) {
+    // Extract the register fields
+    uint8_t rn = (instr >> 5) & 0x1F;   // First source register
+    uint8_t rm = (instr >> 16) & 0x1F;  // Second source register
+    uint8_t shamt = (instr >> 10) & 0x3F; // Shift amount
+    
+    // Get the values from the registers
+    uint64_t operand1 = CURRENT_STATE.REGS[rn];
+    uint64_t operand2 = CURRENT_STATE.REGS[rm] << shamt;
+    
+    // Perform subtraction (result is not stored)
+    uint64_t result = operand1 - operand2;
+    
+    // Update flags only
+    NEXT_STATE.FLAG_N = (result >> 63) & 1;    // Negative flag
+    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0; // Zero flag
+    
+    NEXT_STATE.PC = CURRENT_STATE.PC;
+}
 void beq(uint32_t instr) {
     // Branch if Equal (FLAG_Z == 1)
-    int32_t imm19 = sign_extend(extract_bits(instr, 5, 23), 19);  // Extract and sign-extend 19-bit immediate
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
+    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
+        imm19 |= 0xFFF80000;
+    }
     int32_t offset = imm19 << 2;             // Shift left by 2
     if (CURRENT_STATE.FLAG_Z == 1) {         // Check Zero flag
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
@@ -197,22 +220,25 @@ void beq(uint32_t instr) {
 
 void bne(uint32_t instr) {
     // Branch if Not Equal (FLAG_Z == 0)
-
     printf("BNE: Branching to %d\n", CURRENT_STATE.PC);
     int32_t imm19 = sign_extend(extract_bits(instr, 5, 23),19);  // Extract 19-bit immediate
     int32_t offset = imm19 << 2;             // Shift left by 2
-
     if (!(CURRENT_STATE.FLAG_Z)) {         // Check Zero flag
         printf("BNE: Branching to %d\n", CURRENT_STATE.PC + offset - 4);
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
     } else {
         NEXT_STATE.PC = CURRENT_STATE.PC;
     }
+
 }
 
 void bgt(uint32_t instr) {
+
     // Branch if Greater Than (FLAG_Z == 0 && FLAG_N == 0)
-    int32_t imm19 = sign_extend(extract_bits(instr, 5, 23), 19);  // Extract and sign-extend 19-bit immediate
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
+    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
+        imm19 |= 0xFFF80000;
+    }
     int32_t offset = imm19 << 2;             // Shift left by 2
     if (CURRENT_STATE.FLAG_Z == 0 && CURRENT_STATE.FLAG_N == 0) {  // Check flags
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
@@ -223,7 +249,10 @@ void bgt(uint32_t instr) {
 
 void blt(uint32_t instr) {
     // Branch if Less Than (FLAG_N == 1)
-    int32_t imm19 = sign_extend(extract_bits(instr, 5, 23), 19);  // Extract and sign-extend 19-bit immediate
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
+    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
+        imm19 |= 0xFFF80000;
+    }
     int32_t offset = imm19 << 2;             // Shift left by 2
     if (CURRENT_STATE.FLAG_N == 1) {         // Check Negative flag
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
@@ -234,7 +263,10 @@ void blt(uint32_t instr) {
 
 void bge(uint32_t instr) {
     // Branch if Greater or Equal (FLAG_N == 0)
-    int32_t imm19 = sign_extend(extract_bits(instr, 5, 23), 19);  // Extract and sign-extend 19-bit immediate
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
+    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
+        imm19 |= 0xFFF80000;
+    }
     int32_t offset = imm19 << 2;             // Shift left by 2
     if (CURRENT_STATE.FLAG_N == 0) {         // Check Negative flag
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
@@ -244,8 +276,11 @@ void bge(uint32_t instr) {
 }
 
 void ble(uint32_t instr) {
-    // Branch if Less or Equal (FLAG_Z == 1 || FLAG_N == 1) = !(Z == 0 && N == V)
-    int32_t imm19 = sign_extend(extract_bits(instr, 5, 23), 19);  // Extract and sign-extend 19-bit immediate
+    // Branch if Less or Equal (FLAG_Z == 1 || FLAG_N == 1)
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
+    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
+        imm19 |= 0xFFF80000;
+    }
     int32_t offset = imm19 << 2;             // Shift left by 2
     if (CURRENT_STATE.FLAG_Z == 1 || CURRENT_STATE.FLAG_N == 1) {  // Check flags
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
