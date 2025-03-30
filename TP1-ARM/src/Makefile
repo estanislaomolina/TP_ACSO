@@ -43,23 +43,32 @@ run_server_all: sim
 	for test in ../inputs/bytecodes/*.x; do \
 		test_name=$$(basename $$test .x); \
 		echo "Running test: $$test_name"; \
-		instr_count=0; \
-		while true; do \
-			instr_count=$$((instr_count + 1)); \
+		# Run once to get the total number of instructions (n)
+		echo -e "quit" | ./sim $$test > temp_output.txt; \
+		instr_total=$$(grep -oE "Read [0-9]+ words from program into memory" temp_output.txt | awk '{print $$2}'); \
+		if [ -z "$$instr_total" ]; then echo "Error: Could not determine instruction count for $$test_name"; exit 1; fi; \
+		echo "Total instructions to execute: $$instr_total"; \
+		\
+		# Initialize test as passed
+		test_passed=true; \
+		\
+		# Run the program step-by-step
+		for ((i=1; i<=instr_total; i++)); do \
 			echo -e "run 1\nrdump\nmdump 0x10000000 0x10100000\nquit" | ./sim $$test > output_my_$$test_name.txt; \
-			grep -E "rdump|mdump 0x10000000 0x10100000" output_my_$$test_name.txt > result_my_$$test_name_$$instr_count.txt; \
+			grep -E "rdump|mdump 0x10000000 0x10100000" output_my_$$test_name.txt > result_my_$$test_name_$$i.txt; \
 			echo -e "run 1\nrdump\nmdump 0x10000000 0x10100000\nquit" | ../ref_sim_x86 $$test > output_sim_$$test_name.txt; \
-			grep -E "rdump|mdump 0x10000000 0x10100000" output_sim_$$test_name.txt > result_sim_$$test_name_$$instr_count.txt; \
-			if diff result_my_$$test_name_$$instr_count.txt result_sim_$$test_name_$$instr_count.txt > /dev/null; then \
-				echo "Instruction $$instr_count: TEST $$test_name passed ✅"; \
-			else \
-				echo "Instruction $$instr_count: TEST $$test_name FAILED ❌"; \
-				diff result_my_$$test_name_$$instr_count.txt result_sim_$$test_name_$$instr_count.txt; \
-				break; \
-			fi; \
-			if grep -q "HLT" output_my_$$test_name.txt; then \
-				echo "Program finished for $$test_name."; \
-				break; \
+			grep -E "rdump|mdump 0x10000000 0x10100000" output_sim_$$test_name.txt > result_sim_$$test_name_$$i.txt; \
+			if ! diff result_my_$$test_name_$$i.txt result_sim_$$test_name_$$i.txt > /dev/null; then \
+				echo "Instruction $$i: TEST $$test_name FAILED ❌"; \
+				diff result_my_$$test_name_$$i.txt result_sim_$$test_name_$$i.txt; \
+				test_passed=false; \
 			fi; \
 		done; \
+		\
+		# If all iterations matched, print test passed
+		if [ "$$test_passed" = true ]; then \
+			echo "TEST $$test_name PASSED ✅"; \
+		else \
+			echo "TEST $$test_name FAILED ❌"; \
+		fi; \
 	done
