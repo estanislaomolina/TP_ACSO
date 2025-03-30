@@ -39,4 +39,4 @@ run_k_n: sim
 
 
 run_server_all: sim
-	./run_all_tests.sh
+	./run_test.sh
