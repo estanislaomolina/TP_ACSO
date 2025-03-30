@@ -49,18 +49,20 @@ run_server_all: sim
 		if [ -z "$$instr_total" ]; then echo "Error: Could not determine instruction count for $$test_name"; exit 1; fi; \
 		echo "Total instructions to execute: $$instr_total"; \
 		\
-		# Initialize test as passed
+		# Initialize instruction counter and test status
+		instr_count=0; \
 		test_passed=true; \
 		\
 		# Run the program step-by-step
-		for ((i=1; i<=instr_total; i++)); do \
+		while [ $$instr_count -lt $$instr_total ]; do \
+			instr_count=$$(expr $$instr_count + 1); \
 			echo -e "run 1\nrdump\nmdump 0x10000000 0x10100000\nquit" | ./sim $$test > output_my_$$test_name.txt; \
-			grep -E "rdump|mdump 0x10000000 0x10100000" output_my_$$test_name.txt > result_my_$$test_name_$$i.txt; \
+			grep -E "rdump|mdump 0x10000000 0x10100000" output_my_$$test_name.txt > result_my_$$test_name_$$instr_count.txt; \
 			echo -e "run 1\nrdump\nmdump 0x10000000 0x10100000\nquit" | ../ref_sim_x86 $$test > output_sim_$$test_name.txt; \
-			grep -E "rdump|mdump 0x10000000 0x10100000" output_sim_$$test_name.txt > result_sim_$$test_name_$$i.txt; \
-			if ! diff result_my_$$test_name_$$i.txt result_sim_$$test_name_$$i.txt > /dev/null; then \
-				echo "Instruction $$i: TEST $$test_name FAILED ❌"; \
-				diff result_my_$$test_name_$$i.txt result_sim_$$test_name_$$i.txt; \
+			grep -E "rdump|mdump 0x10000000 0x10100000" output_sim_$$test_name.txt > result_sim_$$test_name_$$instr_count.txt; \
+			if ! diff result_my_$$test_name_$$instr_count.txt result_sim_$$test_name_$$instr_count.txt > /dev/null; then \
+				echo "Instruction $$instr_count: TEST $$test_name FAILED ❌"; \
+				diff result_my_$$test_name_$$instr_count.txt result_sim_$$test_name_$$instr_count.txt; \
 				test_passed=false; \
 			fi; \
 		done; \
