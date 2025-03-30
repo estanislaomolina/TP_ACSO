@@ -197,10 +197,13 @@ void beq(uint32_t instr) {
 
 void bne(uint32_t instr) {
     // Branch if Not Equal (FLAG_Z == 0)
-    int32_t imm19 = extract_bits(instr, 5, 23);  // Extract 19-bit immediate
-    imm19 = sign_extend(imm19, 19); // Sign-extend if needed
+
+    printf("BNE: Branching to %d\n", CURRENT_STATE.PC);
+    int32_t imm19 = sign_extend(extract_bits(instr, 5, 23),19);  // Extract 19-bit immediate
     int32_t offset = imm19 << 2;             // Shift left by 2
-    if (CURRENT_STATE.FLAG_Z == 0) {         // Check Zero flag
+
+    if (!(CURRENT_STATE.FLAG_Z)) {         // Check Zero flag
+        printf("BNE: Branching to %d\n", CURRENT_STATE.PC + offset - 4);
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
     } else {
         NEXT_STATE.PC = CURRENT_STATE.PC;
@@ -208,7 +211,6 @@ void bne(uint32_t instr) {
 }
 
 void bgt(uint32_t instr) {
-<<<<<<< HEAD
     // Branch if Greater Than (FLAG_Z == 0 && FLAG_N == 0)
     int32_t imm19 = sign_extend(extract_bits(instr, 5, 23), 19);  // Extract and sign-extend 19-bit immediate
     int32_t offset = imm19 << 2;             // Shift left by 2
@@ -217,17 +219,6 @@ void bgt(uint32_t instr) {
     } else {
         NEXT_STATE.PC = CURRENT_STATE.PC;
     }
-=======
-    // Extract the 4-bit immediate value after the first 8 bits opcode
-    uint8_t cond = (instr >> 0) & 0xF;
-    NEXT_STATE.PC = CURRENT_STATE.PC;
-} //hola
-
-void bge(uint32_t instr) {
-    // Extract the 4-bit immediate value after the first 8 bits opcode
-    uint8_t cond = (instr >> 0) & 0xF;
-    NEXT_STATE.PC = CURRENT_STATE.PC;
->>>>>>> 70ecb48 (ghjk)
 }
 
 void blt(uint32_t instr) {
