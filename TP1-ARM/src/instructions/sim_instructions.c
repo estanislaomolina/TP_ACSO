@@ -312,18 +312,10 @@ void shifts(uint32_t instruction){
     uint32_t imms = get_bits(instruction, 10, 15); 
     uint32_t immr = get_bits(instruction, 16, 21); 
   
-    if(imms == 63){ // LSL
-      NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] >> immr; 
-    }
-    else{ // LSR
-      uint32_t result = negate_number(imms);
-      NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] << result;
-
-    }
-
-    // Actualizar los flags NZCV
-    NEXT_STATE.FLAG_N = (NEXT_STATE.REGS[rd] >> 63) & 1;  // Flag de negativo
-    NEXT_STATE.FLAG_Z = (NEXT_STATE.REGS[rd] == 0) ? 1 : 0;  // Flag de cero
+    if(imms == 0b000000){
+        lsl(instruction);
+    }else if(imms == 0b000001){
+        lsr(instruction);
 }
 
 void lsr(uint32_t instr) {
