@@ -43,7 +43,6 @@ run_server_all: sim
 	for test in ../inputs/bytecodes/*.x; do \
 		test_name=$$(basename $$test .x); \
 		echo "Running test: $$test_name"; \
-		# Run once to get the total number of instructions (n)
 		echo -e "quit" | ./sim $$test > temp_output.txt; \
 		instr_total=$$(grep -oE "Read [0-9]+ words from program into memory" temp_output.txt | awk '{print $$2}'); \
 		if [ -z "$$instr_total" ]; then echo "Error: Could not determine instruction count for $$test_name"; exit 1; fi; \
