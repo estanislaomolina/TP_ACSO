@@ -312,12 +312,10 @@ void shifts(uint32_t instr){
     uint32_t imms = extract_bits(instr, 10, 15); 
     uint32_t immr = extract_bits(instr, 16, 21); 
   
-    if(imms == 0b000000){
-        lsl(instr);
-    }else if(imms == 0b000001){
+    if(imms == 0b111111){
         lsr(instr);
-    }else{
-        printf("Unknown shift type\n");
+    }else {
+        lsl(instr);
     }
 }
 
