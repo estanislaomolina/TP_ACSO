@@ -305,6 +305,26 @@ void lsl(uint32_t instr) {
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
 
 }
+void shifts(uint32_t instruction){
+    printf("Shifts function enter\n");
+    uint32_t rd = get_bits(instruction, 0, 4);
+    uint32_t rn = get_bits(instruction, 5, 9);
+    uint32_t imms = get_bits(instruction, 10, 15); 
+    uint32_t immr = get_bits(instruction, 16, 21); 
+  
+    if(imms == 63){ // LSL
+      NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] >> immr; 
+    }
+    else{ // LSR
+      uint32_t result = negate_number(imms);
+      NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] << result;
+
+    }
+
+    // Actualizar los flags NZCV
+    NEXT_STATE.FLAG_N = (NEXT_STATE.REGS[rd] >> 63) & 1;  // Flag de negativo
+    NEXT_STATE.FLAG_Z = (NEXT_STATE.REGS[rd] == 0) ? 1 : 0;  // Flag de cero
+}
 
 void lsr(uint32_t instr) {
     // Extraer campos de la instrucción

@@ -32,6 +32,7 @@ void mul(uint32_t instr);
 
 void lsl(uint32_t instr);
 void lsr(uint32_t instr);
+void shifts(uint32_t instr);
 void stur(uint32_t instr);
 void sturb(uint32_t instr);
 void sturh(uint32_t instr);
