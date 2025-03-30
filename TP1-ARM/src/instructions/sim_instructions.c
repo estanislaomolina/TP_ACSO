@@ -316,6 +316,9 @@ void shifts(uint32_t instruction){
         lsl(instruction);
     }else if(imms == 0b000001){
         lsr(instruction);
+    }else{
+        printf("Unknown shift type\n");
+    }
 }
 
 void lsr(uint32_t instr) {
