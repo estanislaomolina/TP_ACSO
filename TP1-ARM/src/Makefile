@@ -48,11 +48,11 @@ run_server_all: sim
 		if [ -z "$$instr_total" ]; then echo "Error: Could not determine instruction count for $$test_name"; exit 1; fi; \
 		echo "Total instructions to execute: $$instr_total"; \
 		\
-		# Initialize instruction counter and test status
+
 		instr_count=0; \
 		test_passed=true; \
 		\
-		# Run the program step-by-step
+
 		while [ $$instr_count -lt $$instr_total ]; do \
 			instr_count=$$(expr $$instr_count + 1); \
 			echo -e "run 1\nrdump\nmdump 0x10000000 0x10100000\nquit" | ./sim $$test > output_my_$$test_name.txt; \
@@ -66,7 +66,7 @@ run_server_all: sim
 			fi; \
 		done; \
 		\
-		# If all iterations matched, print test passed
+
 		if [ "$$test_passed" = true ]; then \
 			echo "TEST $$test_name PASSED ✅"; \
 		else \
