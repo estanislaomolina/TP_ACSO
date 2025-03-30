@@ -26,13 +26,18 @@ void bcond(uint32_t instr);
 void movz(uint32_t instr);
 
 void cbz(uint32_t instr);
+void cbnz(uint32_t instr);
+void mul(uint32_t instr);
 
 
 void lsl(uint32_t instr);
+void lsr(uint32_t instr);
 void stur(uint32_t instr);
 void sturb(uint32_t instr);
+void sturh(uint32_t instr);
 void ldur(uint32_t instr);
 void ldurb(uint32_t instr);
+void ldurh(uint32_t instr);
 void mov(uint32_t instr);
 
 

@@ -25,6 +25,7 @@ const instruction_t instructions_list[] = {
     {ldur, 0b1111100001, 10},
     {ldurb, 0b00111000, 8},
     {lsl, 0b11010011, 8},
+    {lsr, 0b11010011, 8},
     {mov, 0b11010010, 8},
 };
 

@@ -306,6 +306,22 @@ void lsl(uint32_t instr) {
 
 }
 
+void lsr(uint32_t instr) {
+    // Extraer campos de la instrucción
+    uint8_t rd = (instr >> 0) & 0x1F;   // Registro destino
+    uint8_t rn = (instr >> 5) & 0x1F;   // Registro fuente
+    uint32_t imms = extract_bits(instr, 10, 15); // Inmediato de 6 bits
+    uint64_t immr = extract_bits(instr, 16, 21); // Inmediato de 6 bits
+    
+    uint64_t shift = 63 - imms;
+    uint64_t result = CURRENT_STATE.REGS[rn] >> shift;
+    NEXT_STATE.REGS[rd] = result;
+    // Actualizar los flags NZCV
+    NEXT_STATE.FLAG_N = (result<0);
+    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
+
+}
+
 void stur(uint32_t instr) {
     // Extract fields from instruction
     uint8_t rt = (instr >> 0) & 0x1F;   // Register to store
@@ -338,6 +354,16 @@ void sturb(uint32_t instr) {
 
     // Escribir el byte en memoria
     mem_write_32(address, values);
+}
+
+void sturh(uint32_t instr) {
+    // Extract fields from instruction
+    uint8_t rt = (instr >> 0) & 0x1F;   // Register to store
+    uint8_t rn = (instr >> 5) & 0x1F;   // Base register
+    uint16_t imm12 = (instr >> 10) & 0xFFF;  // 12-bit immediate offset
+
+    uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
+    mem_write_32(address, CURRENT_STATE.REGS[rt]);
 }
 
 
@@ -376,6 +402,16 @@ void ldurb(uint32_t instr) {
     NEXT_STATE.REGS[rt] = values;
 }
 
+void ldurh(uint32_t instr) {
+    // Extract fields from instruction
+    uint8_t rt = (instr >> 0) & 0x1F;   // Register to load
+    uint8_t rn = (instr >> 5) & 0x1F;   // Base register
+    uint16_t imm12 = (instr >> 10) & 0xFFF;  // 12-bit immediate offset
+
+    uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
+    mem_write_32(address, CURRENT_STATE.REGS[rt]);
+}
+
 void mov(uint32_t instr) {
     // Extract the 5-bit destination register (rd)
     uint8_t rd = (instr >> 0) & 0x1F;  
@@ -392,6 +428,29 @@ void mov(uint32_t instr) {
     // Load the immediate value into the destination register
     NEXT_STATE.REGS[rd] = imm;
 
+}
+
+void cbnz(uint32_t instr) {
+    // Extract the 5-bit register (rt) and 19-bit immediate value (imm19)
+    uint8_t rt = (instr >> 0) & 0x1F;  // Test register
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Immediate value (bits [23:5])
+
+    // Perform sign extension for the 19-bit immediate value
+    if (imm19 & (1 << 18)) { // Check if the 19th bit (sign bit) is set
+        imm19 |= 0xFFF80000; // Sign-extend to 32 bits
+    }
+
+    // Calculate the branch offset (shift left by 2 as per ARM spec)
+    int32_t offset = imm19 << 2;
+
+    // Check if the register value is non-zero
+    if (CURRENT_STATE.REGS[rt] != 0) {
+        // Update the Program Counter (PC) to the branch target
+        NEXT_STATE.PC = CURRENT_STATE.PC + offset;
+    } else {
+        // If the condition is not met, increment PC to the next instruction
+        NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+    }
 }
 
 void cbz(uint32_t instr) {
@@ -416,4 +475,25 @@ void cbz(uint32_t instr) {
         NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     }
 
+}
+
+void mul(uint32_t instr) {
+    // Extraer los campos de la instrucción
+    uint8_t rd = (instr >> 0) & 0x1F;  // Registro destino
+    uint8_t rn = (instr >> 5) & 0x1F;  // Registro fuente
+    uint8_t rm = (instr >> 16) & 0x1F; // Registro fuente 2
+
+    // Obtener el valor de los registros fuente
+    uint64_t operand1 = CURRENT_STATE.REGS[rn];
+    uint64_t operand2 = CURRENT_STATE.REGS[rm];
+
+    // Realizar la multiplicación
+    uint64_t result = operand1 * operand2;
+
+    // Almacenar el resultado en el registro destino
+    NEXT_STATE.REGS[rd] = result;
+
+    // Actualizar los flags NZCV
+    NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
+    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
 }
