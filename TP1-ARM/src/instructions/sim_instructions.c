@@ -200,10 +200,10 @@ void beq(uint32_t instr) {
     // Check if the Zero flag (Z) is set
     if (CURRENT_STATE.FLAG_Z == 1) {
         // Update the Program Counter (PC) to the branch target
-        NEXT_STATE.PC = CURRENT_STATE.PC + offset;
+        NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
     } else {
         // If the condition is not met, increment PC to the next instruction
-        NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+        NEXT_STATE.PC = CURRENT_STATE.PC;
     }
 }
 void bne(uint32_t instr) {
