@@ -13,7 +13,7 @@ void eors(uint32_t instr); // FUNCIONAN
 
 
 void orr(uint32_t instr); // FUNCIONAN
-void b(uint32_t instr); //revisar
+void b(uint32_t instr); //funciona
 void br(uint32_t instr); //revisar
 void cmp(uint32_t instr); //FUNCIONAN
 void beq(uint32_t instr); //FUNCIONAN
@@ -26,7 +26,7 @@ void bcond(uint32_t instr); //FUNCIONAN
 
 void movz(uint32_t instr); // FUNCIONAN
 
-void cbz(uint32_t instr); //revisar
+void cbz(uint32_t instr); //FUNCIONA
 void cbnz(uint32_t instr); //FUNCIONA
 void mul(uint32_t instr); //FUNCIONA
 

@@ -163,12 +163,7 @@ void orr(uint32_t instr){
 
 void b(uint32_t instr) {
     // Extract the 26-bit immediate value (imm26)
-    int32_t imm26 = (instr >> 0) & 0x3FFFFFF;  // Immediate value (bits [25:0])
-
-    // Perform sign extension for the 26-bit immediate value
-    if (imm26 & (1 << 25)) { // Check if the 26th bit (sign bit) is set
-        imm26 |= 0xFC000000; // Sign-extend to 32 bits
-    }
+    int32_t imm26 = sign_extend(extract_bits(instr, 5, 31), 26);  // Extract 26-bit immediate
 
     // Calculate the branch offset (shift left by 2 as per ARM spec)
     int32_t offset = imm26 << 2;
@@ -177,12 +172,15 @@ void b(uint32_t instr) {
     NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
 }
 
-void br(uint32_t instr){
-    // Extraer los campos de la instrucción
-    uint8_t rn = (instr >> 5) & 0x1F;  // Registro fuente
+void br(uint32_t instr) {
+    // Extract the register number (bits [5:9])
+    uint8_t rn = (instr >> 5) & 0x1F;
 
-    // Saltar a la dirección
-    NEXT_STATE.PC = CURRENT_STATE.REGS[rn];
+    // Get the address from the register
+    uint64_t target_address = CURRENT_STATE.REGS[rn];
+
+    // Branch to the target address
+    NEXT_STATE.PC = target_address -4;
 }
 
 void cmp(uint32_t instr) {

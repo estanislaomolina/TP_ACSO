@@ -1,12 +1,12 @@
 
 Current register/bus values :
 -------------------------------------
-Instruction Count : 2
-PC                : 0x400008
+Instruction Count : 4
+PC                : 0x1000
 Registers:
-X0: 0x9
-X1: 0x0
-X2: 0x0
+X0: 0xa
+X1: 0x1000
+X2: 0x14
 X3: 0x0
 X4: 0x0
 X5: 0x0
