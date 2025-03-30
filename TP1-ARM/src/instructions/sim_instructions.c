@@ -313,8 +313,10 @@ void shifts(uint32_t instr){
     uint32_t immr = extract_bits(instr, 16, 21); 
   
     if(imms == 0b111111){
+        printf("LSR: Logical Shift Left\n");
         lsr(instr);
     }else {
+        printf("LSL: Logical Shift Left\n");
         lsl(instr);
     }
 }
