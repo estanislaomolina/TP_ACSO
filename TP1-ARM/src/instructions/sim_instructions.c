@@ -305,21 +305,6 @@ void lsl(uint32_t instr) {
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
 
 }
-void shifts(uint32_t instr){
-    printf("Shifts function enter\n");
-    uint32_t rd = extract_bits(instr, 0, 4);
-    uint32_t rn =extract_bits(instr, 5, 9);
-    uint32_t imms = extract_bits(instr, 10, 15); 
-    uint32_t immr = extract_bits(instr, 16, 21); 
-  
-    if(imms == 0b111111){
-        printf("LSR: Logical Shift Left\n");
-        lsr(instr);
-    }else {
-        printf("LSL: Logical Shift Left\n");
-        lsl(instr);
-    }
-}
 
 void lsr(uint32_t instr) {
     // Extraer campos de la instrucción
@@ -328,13 +313,29 @@ void lsr(uint32_t instr) {
     uint32_t imms = extract_bits(instr, 10, 15); // Inmediato de 6 bits
     uint64_t immr = extract_bits(instr, 16, 21); // Inmediato de 6 bits
     
-    uint64_t shift = 63 - imms;
+    uint64_t shift = imms;
     uint64_t result = CURRENT_STATE.REGS[rn] >> shift;
     NEXT_STATE.REGS[rd] = result;
     // Actualizar los flags NZCV
     NEXT_STATE.FLAG_N = (result<0);
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
 
+}
+
+void shifts(uint32_t instr){
+    printf("Shifts function enter\n");
+    uint32_t rd = extract_bits(instr, 0, 4);
+    uint32_t rn =extract_bits(instr, 5, 9);
+    uint32_t imms = extract_bits(instr, 10, 15); 
+    uint32_t immr = extract_bits(instr, 16, 21); 
+  
+    if(imms == 0b111111){
+        printf("LSR: Logical Shift Right\n");
+        lsr(instr);
+    }else {
+        printf("LSL: Logical Shift Left\n");
+        lsl(instr);
+    }
 }
 
 void stur(uint32_t instr) {
