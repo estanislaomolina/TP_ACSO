@@ -42,6 +42,8 @@ void ldurb(uint32_t instr); // FUNCIONAN
 void ldurh(uint32_t instr); // FUNCIONAN
 void mov(uint32_t instr); // FUNCIONAN
 
+void add_imm(uint32_t instr); // FUNCIONAN
+void add_ext(uint32_t instr); // FUNCIONAN
 
 
 #endif

@@ -221,7 +221,6 @@ void bne(uint32_t instr) {
     int32_t imm19 = sign_extend(extract_bits(instr, 5, 23),19);  // Extract 19-bit immediate
     int32_t offset = imm19 << 2;             // Shift left by 2
     if (!(CURRENT_STATE.FLAG_Z)) {         // Check Zero flag
-        printf("BNE: Branching to %d\n", CURRENT_STATE.PC + offset - 4);
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
     } else {
         NEXT_STATE.PC = CURRENT_STATE.PC;
@@ -235,7 +234,6 @@ void bgt(uint32_t instr) {
     int32_t imm19 = sign_extend(extract_bits(instr, 5, 23),19);  // Extract 19-bit immediate
     int32_t offset = imm19 << 2;             // Shift left by 2
     if (CURRENT_STATE.FLAG_Z == 0 && CURRENT_STATE.FLAG_N == 0) {  // Check flags
-        printf("BGT: Branching to %d\n", CURRENT_STATE.PC + offset - 4);
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
     } else {
         NEXT_STATE.PC = CURRENT_STATE.PC;
@@ -359,10 +357,8 @@ void shifts(uint32_t instr){
     uint32_t immr = extract_bits(instr, 16, 21); 
   
     if(imms == 0b111111){
-        printf("LSR: Logical Shift Right\n");
         lsr(instr);
     }else {
-        printf("LSL: Logical Shift Left\n");
         lsl(instr);
     }
 }
@@ -379,8 +375,6 @@ void stur(uint32_t instr) {
 }
 
 void sturb(uint32_t instr) {
-    printf("STURB: Storing byte to memory.\n");
-
     // Extraer campos de la instrucción
     uint8_t rt = extract_bits(instr, 0, 4);   // Registro destino (bits 0-4)
     uint8_t rn = extract_bits(instr, 5, 9);   // Registro base (bits 5-9)
@@ -417,7 +411,6 @@ void sturh(uint32_t instr) {
 
 
 void ldur(uint32_t instr) {
-    printf("LDUR: Loading value from memory.\n");
     // Extract fields
     uint8_t rt = extract_bits(instr, 0, 4);   // Destination register (e.g., X1)
     uint8_t rn = extract_bits(instr, 5, 9);   // Base register (e.g., X2)
@@ -551,5 +544,36 @@ void mul(uint32_t instr) {
     // Almacenar el resultado en el registro destino
     NEXT_STATE.REGS[rd] = result;
 
+    NEXT_STATE.PC = CURRENT_STATE.PC;
+}
+
+void add_imm(uint32_t instr) {
+    uint32_t rd = extract_bits(instr, 0, 4);
+    uint32_t rn = extract_bits(instr, 5, 9);
+    uint32_t imm12 = extract_bits(instr, 10, 21);
+    uint32_t shift = extract_bits(instr, 22, 23);
+    uint64_t operand1 = CURRENT_STATE.REGS[rn];
+    uint64_t operand2 = imm12;
+    if (shift == 0b01) {
+        operand2 <<= 12;
+    }
+    uint64_t result = operand1 + operand2;
+    NEXT_STATE.REGS[rd] = result;
+    NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
+    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
+    NEXT_STATE.PC = CURRENT_STATE.PC;
+}
+
+void add_ext(uint32_t instr) {
+    uint32_t rd = extract_bits(instr, 0, 4);
+    uint32_t rn = extract_bits(instr, 5, 9);
+    uint32_t rm = extract_bits(instr, 16, 20);
+    uint32_t shamt = extract_bits(instr, 10, 15);
+    uint64_t operand1 = CURRENT_STATE.REGS[rn];
+    uint64_t operand2 = CURRENT_STATE.REGS[rm] << shamt;
+    uint64_t result = operand1 + operand2;
+    NEXT_STATE.REGS[rd] = result;
+    NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
+    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
     NEXT_STATE.PC = CURRENT_STATE.PC;
 }

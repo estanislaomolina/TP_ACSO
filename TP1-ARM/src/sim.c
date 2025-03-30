@@ -34,6 +34,8 @@ const instruction_t instructions_list[] = {
     {cbz, 0b10110100, 8}, // REVISAR
     {cbnz, 0b10110101, 8}, // FUNCA BIEN
     {mul, 0b10011011, 8}, // REVISAR
+    {add_imm, 0b10010001, 8},
+    {add_ext, 0b10101011, 8}
 };
 
 
