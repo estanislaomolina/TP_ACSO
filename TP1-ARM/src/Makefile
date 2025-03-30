@@ -36,14 +36,3 @@ run_k_n: sim
 	echo -e "run $(n)\nrdump\nmdump 0x10000000 0x10000008\nquit" | ./sim ../inputs/bytecodes/$(file).x
 	echo -e "run $(n)\nrdump\nmdump 0x10000000 0x10000008\nquit" | ../ref_sim_arm_m3 ../inputs/bytecodes/$(file).x
 	make clean
-
-
-
-valgrind: sim
-	@if [ -z "$(file)" ]; then echo "Error: Debes proporcionar un valor para 'file'. Usa: make valgrind file=nombre"; exit 1; fi
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./sim ../inputs/bytecodes/$(file).x
-	make clean
-leaks: sim
-	@if [ -z "$(file)" ]; then echo "Error: Debes proporcionar un valor para 'file'. Usa: make leaks file=nombre"; exit 1; fi
-	leaks -atExit -- ./sim ../inputs/bytecodes/$(file).x
-	make clean

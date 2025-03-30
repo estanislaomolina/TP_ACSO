@@ -22,6 +22,7 @@ const instruction_t instructions_list[] = {
     {bcond, 0b01010100, 8},
     {stur, 0b1111100000, 10},
     {sturb, 0b0011100000 , 10},
+    {sturh, 0b0111100000, 10},
     {ldur, 0b1111100001, 10},
     {ldurb, 0b00111000, 8},
     {lsl, 0b11010011, 8},
@@ -61,5 +62,6 @@ void process_instruction(){
     }
     printf("Unknown instruction opcode: ");
     print_binary(instruction); // Print unknown instruction for debugging
+    NEXT_STATE.PC = CURRENT_STATE.PC + 4;
 }
 
