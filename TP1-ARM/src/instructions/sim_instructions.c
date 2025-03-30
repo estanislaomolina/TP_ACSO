@@ -174,7 +174,7 @@ void b(uint32_t instr) {
     int32_t offset = imm26 << 2;
 
     // Update the Program Counter (PC) to the branch target
-    NEXT_STATE.PC = CURRENT_STATE.PC + offset;
+    NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
 }
 
 void br(uint32_t instr){
@@ -184,74 +184,88 @@ void br(uint32_t instr){
     // Saltar a la dirección
     NEXT_STATE.PC = CURRENT_STATE.REGS[rn];
 }
-
 void beq(uint32_t instr) {
-    // Extract the 19-bit immediate value (bits [23:5])
-    int32_t imm19 = (instr >> 5) & 0x7FFFF;
-
-    // Perform sign extension for the 19-bit immediate value
-    if (imm19 & (1 << 18)) { // Check if the 19th bit (sign bit) is set
-        imm19 |= 0xFFF80000; // Sign-extend to 32 bits
+    // Branch if Equal (FLAG_Z == 1)
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
+    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
+        imm19 |= 0xFFF80000;
     }
-
-    // Calculate the branch offset (shift left by 2 as per ARM spec)
-    int32_t offset = imm19 << 2;
-
-    // Check if the Zero flag (Z) is set
-    if (CURRENT_STATE.FLAG_Z == 1) {
-        // Update the Program Counter (PC) to the branch target
+    int32_t offset = imm19 << 2;             // Shift left by 2
+    if (CURRENT_STATE.FLAG_Z == 1) {         // Check Zero flag
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
     } else {
-        // If the condition is not met, increment PC to the next instruction
         NEXT_STATE.PC = CURRENT_STATE.PC;
     }
 }
-void bne(uint32_t instr) {
-    // Extract the 4-bit immediate value after the first 8 bits opcode
-    uint8_t cond = (instr >> 0) & 0xF;
-    NEXT_STATE.PC = CURRENT_STATE.PC;
 
+void bne(uint32_t instr) {
+    // Branch if Not Equal (FLAG_Z == 0)
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
+    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
+        imm19 |= 0xFFF80000;
+    }
+    int32_t offset = imm19 << 2;             // Shift left by 2
+    if (CURRENT_STATE.FLAG_Z == 0) {         // Check Zero flag
+        NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
+    } else {
+        NEXT_STATE.PC = CURRENT_STATE.PC;
+    }
 }
 
 void bgt(uint32_t instr) {
-    // Extract the 4-bit immediate value after the first 8 bits opcode
-    uint8_t cond = (instr >> 0) & 0xF;
-    NEXT_STATE.PC = CURRENT_STATE.PC;
-}
-
-void bge(uint32_t instr) {
-    // Extract the 4-bit immediate value after the first 8 bits opcode
-    uint8_t cond = (instr >> 0) & 0xF;
-    NEXT_STATE.PC = CURRENT_STATE.PC;
+    // Branch if Greater Than (FLAG_Z == 0 && FLAG_N == 0)
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
+    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
+        imm19 |= 0xFFF80000;
+    }
+    int32_t offset = imm19 << 2;             // Shift left by 2
+    if (CURRENT_STATE.FLAG_Z == 0 && CURRENT_STATE.FLAG_N == 0) {  // Check flags
+        NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
+    } else {
+        NEXT_STATE.PC = CURRENT_STATE.PC;
+    }
 }
 
 void blt(uint32_t instr) {
-    // Extract the 19-bit immediate value (bits [23:5])
-    int32_t imm19 = (instr >> 5) & 0x7FFFF;
-
-    // Perform sign extension for the 19-bit immediate value
-    if (imm19 & (1 << 18)) { // Check if the 19th bit (sign bit) is set
-        imm19 |= 0xFFF80000; // Sign-extend to 32 bits
+    // Branch if Less Than (FLAG_N == 1)
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
+    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
+        imm19 |= 0xFFF80000;
     }
-
-    // Calculate the branch offset (shift left by 2 as per ARM spec)
-    int32_t offset = imm19 << 2;
-
-    // Check if the Negative flag (N) is set and Zero flag (Z) is clear
-    if (CURRENT_STATE.FLAG_N == 1 && CURRENT_STATE.FLAG_Z == 0) {
-        // Update the Program Counter (PC) to the branch target
-        NEXT_STATE.PC = CURRENT_STATE.PC + offset;
+    int32_t offset = imm19 << 2;             // Shift left by 2
+    if (CURRENT_STATE.FLAG_N == 1) {         // Check Negative flag
+        NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
     } else {
-        // If the condition is not met, increment PC to the next instruction
-        NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+        NEXT_STATE.PC = CURRENT_STATE.PC;
     }
-    NEXT_STATE.PC = CURRENT_STATE.PC;
+}
+
+void bge(uint32_t instr) {
+    // Branch if Greater or Equal (FLAG_N == 0)
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
+    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
+        imm19 |= 0xFFF80000;
+    }
+    int32_t offset = imm19 << 2;             // Shift left by 2
+    if (CURRENT_STATE.FLAG_N == 0) {         // Check Negative flag
+        NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
+    } else {
+        NEXT_STATE.PC = CURRENT_STATE.PC;
+    }
 }
 
 void ble(uint32_t instr) {
-    // Extract the 4-bit immediate value after the first 8 bits opcode
-    uint8_t cond = (instr >> 0) & 0xF;
-    NEXT_STATE.PC = CURRENT_STATE.PC;
+    // Branch if Less or Equal (FLAG_Z == 1 || FLAG_N == 1)
+    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
+    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
+        imm19 |= 0xFFF80000;
+    }
+    int32_t offset = imm19 << 2;             // Shift left by 2
+    if (CURRENT_STATE.FLAG_Z == 1 || CURRENT_STATE.FLAG_N == 1) {  // Check flags
+        NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
+    } else {
+        NEXT_STATE.PC = CURRENT_STATE.PC;
+    }
 }
 
 void bcond(uint32_t instr){
@@ -518,7 +532,7 @@ void cbz(uint32_t instr) {
     // Check if the register value is zero
     if (CURRENT_STATE.REGS[rt] == 0) {
         // Update the Program Counter (PC) to the branch target
-        NEXT_STATE.PC = CURRENT_STATE.PC + offset;
+        NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
     } 
 
 }
