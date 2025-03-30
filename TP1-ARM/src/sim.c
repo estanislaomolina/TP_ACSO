@@ -28,6 +28,8 @@ const instruction_t instructions_list[] = {
     {ldurh, 0b0111100001, 10},
     {shifts, 0b11010011, 8},
     {mov, 0b11010010, 8},
+    {cbz, 0b10110100, 8},
+    {cbnz, 0b101101, 8},
 };
 
 
