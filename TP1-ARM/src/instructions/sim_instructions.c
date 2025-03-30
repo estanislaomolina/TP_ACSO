@@ -313,7 +313,7 @@ void lsr(uint32_t instr) {
     uint32_t imms = extract_bits(instr, 10, 15); // Inmediato de 6 bits
     uint64_t immr = extract_bits(instr, 16, 21); // Inmediato de 6 bits
     
-    uint64_t shift = imms;
+    uint64_t shift = 63 - imms;
     uint64_t result = CURRENT_STATE.REGS[rn] >> shift;
     NEXT_STATE.REGS[rd] = result;
     // Actualizar los flags NZCV
