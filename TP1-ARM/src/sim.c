@@ -15,7 +15,8 @@ const instruction_t instructions_list[] = {
     {adds_imm, 0b10110001, 8}, //FUNCAN BIEN
     {adds_ext, 0b10101011, 8}, //FUNCAN BIEN
     {subs_imm, 0b11110001, 8}, //FUNCAN BIEN
-    {subs_ext, 0b11101011, 8}, //FUNCAN BIEN
+    {cmp, 0b11101011, 8}, // CMP (compare registers)
+    {subs_ext, 0b11101011, 8}, // SUBS (extended register)
     {ands, 0b11101010, 8}, //FUNCAN BIEN
     {eors, 0b11001010, 8}, //FUNCAN BIEN
     {orr, 0b10101010, 8}, //FUNCAN BIEN
@@ -47,20 +48,34 @@ void process_instruction(){
 
     // Print the instruction in binary format
     printf("Executing instruction: ");
-    print_binary(instruction); 
-
-    // Decodificar y ejecutar la instrucción
-    // Los valores de cada case me los tiro el chat. 
-    // Se supone que son los opcodes de cada instrucción y los valores se pueden encontrar en TP1-ARM/ref/DDI0487B_a_armv8_arm.pdf
+    print_binary(instruction);
+    
     for (int i = 0; i < sizeof(instructions_list) / sizeof(instruction_t); i++) {
         uint8_t size = instructions_list[i].size;
         uint32_t instr_opcode = instructions_list[i].opcode;
-        uint32_t opcode = extract_bits(instruction, 32 - size, 32 - size + size - 1); // Adjusted bit range
+        uint32_t opcode = extract_bits(instruction, 32 - size, 32 - size + size - 1);
+        
         if (opcode == instr_opcode) {
-            // Llamar a la función correspondiente
+            // Special case for distinguishing between CMP and SUBS_EXT
+            if (opcode == 0b11101011) {
+                uint8_t rd = instruction & 0x1F;  // Extract destination register
+                if (rd == 31 && instructions_list[i].instruction == cmp) {
+                    // It's a CMP instruction (Rd = XZR = 31)
+                    instructions_list[i].instruction(instruction);
+                    NEXT_STATE.PC += 4;
+                    return;
+                } else if (rd != 31 && instructions_list[i].instruction == subs_ext) {
+                    // It's a SUBS_EXT instruction
+                    instructions_list[i].instruction(instruction);
+                    NEXT_STATE.PC += 4;
+                    return;
+                }
+                // If neither condition is met, continue to next instruction
+                continue;
+            }
+            
+            // For all other instructions, proceed normally
             instructions_list[i].instruction(instruction);
-            
-            
             NEXT_STATE.PC += 4;
             return;
         }
@@ -70,3 +85,4 @@ void process_instruction(){
     NEXT_STATE.PC = CURRENT_STATE.PC + 4;
 }
 
+// hago el commit y me tira que no hay cambios
