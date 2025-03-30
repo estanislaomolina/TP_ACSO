@@ -30,7 +30,8 @@ const instruction_t instructions_list[] = {
     {shifts, 0b11010011, 8}, //FUNCAN BIEN
     {mov, 0b11010010, 8}, //FUNCAN BIEN
     {cbz, 0b10110100, 8}, // REVISAR
-    {cbnz, 0b10110101, 8}, // REVISAR
+    {cbnz, 0b10110101, 8}, // FUNCA BIEN
+    {mul, 0b10011011, 8}, // REVISAR
 };
 
 
@@ -58,8 +59,9 @@ void process_instruction(){
         if (opcode == instr_opcode) {
             // Llamar a la función correspondiente
             instructions_list[i].instruction(instruction);
-
-            NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+            
+            
+            NEXT_STATE.PC += 4;
             return;
         }
     }

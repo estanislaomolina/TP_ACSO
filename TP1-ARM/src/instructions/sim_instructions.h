@@ -26,8 +26,8 @@ void bcond(uint32_t instr); //revisar
 void movz(uint32_t instr); // FUNCIONAN
 
 void cbz(uint32_t instr); //revisar
-void cbnz(uint32_t instr); //No funca
-void mul(uint32_t instr); //No la llegue a probar, arreglar porimero cbnz
+void cbnz(uint32_t instr); //FUNCIONA
+void mul(uint32_t instr); //FUNCIONA
 
 
 void lsl(uint32_t instr); // FUNCIONAN

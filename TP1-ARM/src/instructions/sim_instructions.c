@@ -40,6 +40,7 @@ void adds_imm(uint32_t instr) {
     // Actualizar los flags NZCV
     NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void adds_ext(uint32_t instr){
@@ -64,6 +65,7 @@ void adds_ext(uint32_t instr){
     // Actualizar los flags NZCV
     NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void subs_imm(uint32_t instr) {
@@ -91,6 +93,7 @@ void subs_imm(uint32_t instr) {
     // Actualizar los flags NZCV
     NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void subs_ext(uint32_t instr) {
@@ -113,6 +116,7 @@ void subs_ext(uint32_t instr) {
     // Actualizar los flags NZCV
     NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void ands(uint32_t instr) {
@@ -134,6 +138,7 @@ void ands(uint32_t instr) {
     // Actualizar los flags NZ
     NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void eors(uint32_t instr) {
@@ -143,6 +148,7 @@ void eors(uint32_t instr) {
     uint8_t rm = (instr >> 16) & 0x1F;  // Registro fuente 2
 
     NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] ^ CURRENT_STATE.REGS[rm];
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void orr(uint32_t instr){
@@ -152,6 +158,7 @@ void orr(uint32_t instr){
     uint8_t rm = (instr >> 16) & 0x1F;  // Registro fuente 2
 
     NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rn] | CURRENT_STATE.REGS[rm];
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void b(uint32_t instr) {
@@ -202,17 +209,20 @@ void beq(uint32_t instr) {
 void bne(uint32_t instr) {
     // Extract the 4-bit immediate value after the first 8 bits opcode
     uint8_t cond = (instr >> 0) & 0xF;
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 
 }
 
 void bgt(uint32_t instr) {
     // Extract the 4-bit immediate value after the first 8 bits opcode
     uint8_t cond = (instr >> 0) & 0xF;
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void bge(uint32_t instr) {
     // Extract the 4-bit immediate value after the first 8 bits opcode
     uint8_t cond = (instr >> 0) & 0xF;
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void blt(uint32_t instr) {
@@ -235,11 +245,13 @@ void blt(uint32_t instr) {
         // If the condition is not met, increment PC to the next instruction
         NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     }
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void ble(uint32_t instr) {
     // Extract the 4-bit immediate value after the first 8 bits opcode
     uint8_t cond = (instr >> 0) & 0xF;
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void bcond(uint32_t instr){
@@ -274,6 +286,7 @@ void bcond(uint32_t instr){
 
     // Saltar a la dirección
     //NEXT_STATE.PC = target;
+    
 }
 
 
@@ -288,6 +301,7 @@ void movz(uint32_t instr) {
 
     // Store the value in the destination register
     NEXT_STATE.REGS[rd] = value;
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void lsl(uint32_t instr) {
@@ -303,6 +317,7 @@ void lsl(uint32_t instr) {
     // Actualizar los flags NZCV
     NEXT_STATE.FLAG_N = (result<0);
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 
 }
 
@@ -319,6 +334,7 @@ void lsr(uint32_t instr) {
     // Actualizar los flags NZCV
     NEXT_STATE.FLAG_N = (result<0);
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 
 }
 
@@ -346,6 +362,7 @@ void stur(uint32_t instr) {
 
     uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
     mem_write_32(address, CURRENT_STATE.REGS[rt]);
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void sturb(uint32_t instr) {
@@ -370,6 +387,7 @@ void sturb(uint32_t instr) {
 
     // Escribir el byte en memoria
     mem_write_32(address, values);
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void sturh(uint32_t instr) {
@@ -381,6 +399,7 @@ void sturh(uint32_t instr) {
     uint64_t address = CURRENT_STATE.REGS[rn] + imm9;
     uint32_t data = CURRENT_STATE.REGS[rt];
     mem_write_32(address, data);
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 
@@ -401,6 +420,7 @@ void ldur(uint32_t instr) {
 
     // Store the loaded value into the destination register
     NEXT_STATE.REGS[rt] = values;
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void ldurb(uint32_t instr) {
@@ -417,6 +437,7 @@ void ldurb(uint32_t instr) {
 
     // Store the loaded value into the destination register
     NEXT_STATE.REGS[rt] = values;
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 void ldurh(uint32_t instr) {
@@ -440,6 +461,8 @@ void ldurh(uint32_t instr) {
 
     // Store zero-extended 16-bit value in the register
     NEXT_STATE.REGS[rt] = (uint64_t)value;
+
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
 
 
@@ -460,30 +483,24 @@ void mov(uint32_t instr) {
     // Load the immediate value into the destination register
     NEXT_STATE.REGS[rd] = imm;
 
+    NEXT_STATE.PC = CURRENT_STATE.PC;
+
 }
 
 void cbnz(uint32_t instr) {
-    // Extract the 5-bit register (rt) and 19-bit immediate value (imm19)
-    uint8_t rt = (instr >> 0) & 0x1F;  // Test register
-    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Immediate value (bits [23:5])
+    // Extraer los campos de la instrucción
+    uint8_t rn = extract_bits(instr, 0, 4);  // Registro a verificar
+    int32_t imm19 = sign_extend(extract_bits(instr, 5, 23), 19);  // Inmediato de 19 bits
 
-    // Perform sign extension for the 19-bit immediate value
-    if (imm19 & (1 << 18)) { // Check if the 19th bit (sign bit) is set
-        imm19 |= 0xFFF80000; // Sign-extend to 32 bits
-    }
+    int32_t offset = imm19 << 2; // Calcular el desplazamiento (según la especificación ARM)
 
-    // Calculate the branch offset (shift left by 2 as per ARM spec)
-    int32_t offset = imm19 << 2;
-
-    // Check if the register value is non-zero
-    if (CURRENT_STATE.REGS[rt] != 0) {
-        // Update the Program Counter (PC) to the branch target
-        NEXT_STATE.PC = CURRENT_STATE.PC + offset;
+    if (CURRENT_STATE.REGS[rn] != 0) {
+        NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
     } else {
-        // If the condition is not met, increment PC to the next instruction
-        NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+        NEXT_STATE.PC = CURRENT_STATE.PC;
     }
 }
+
 
 void cbz(uint32_t instr) {
     // Extract the 5-bit register (rt) and 19-bit immediate value (imm19)
@@ -502,18 +519,15 @@ void cbz(uint32_t instr) {
     if (CURRENT_STATE.REGS[rt] == 0) {
         // Update the Program Counter (PC) to the branch target
         NEXT_STATE.PC = CURRENT_STATE.PC + offset;
-    } else {
-        // If the condition is not met, increment PC to the next instruction
-        NEXT_STATE.PC = CURRENT_STATE.PC + 4;
-    }
+    } 
 
 }
 
 void mul(uint32_t instr) {
     // Extraer los campos de la instrucción
-    uint8_t rd = (instr >> 0) & 0x1F;  // Registro destino
-    uint8_t rn = (instr >> 5) & 0x1F;  // Registro fuente
-    uint8_t rm = (instr >> 16) & 0x1F; // Registro fuente 2
+    uint8_t rd = extract_bits(instr, 0, 4);  // Registro destino
+    uint8_t rn = extract_bits(instr, 5, 9);  // Registro fuente
+    uint8_t rm = extract_bits(instr, 16, 20); // Registro fuente 2
 
     // Obtener el valor de los registros fuente
     uint64_t operand1 = CURRENT_STATE.REGS[rn];
@@ -525,7 +539,5 @@ void mul(uint32_t instr) {
     // Almacenar el resultado en el registro destino
     NEXT_STATE.REGS[rd] = result;
 
-    // Actualizar los flags NZCV
-    NEXT_STATE.FLAG_N = (result >> 63) & 1;  // Flag de negativo
-    NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
+    NEXT_STATE.PC = CURRENT_STATE.PC;
 }
