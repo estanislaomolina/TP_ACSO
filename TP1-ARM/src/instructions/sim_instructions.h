@@ -3,43 +3,43 @@
 #ifndef SIM_INSTRUCTIONS_H
 #define SIM_INSTRUCTIONS_H
 
-void hlt();
-void adds_imm(uint32_t instr);
-void adds_ext(uint32_t instr);
-void subs_imm(uint32_t instr);
-void subs_ext(uint32_t instr);
-void ands(uint32_t instr);
-void eors(uint32_t instr);
+void hlt(); // FUNCIONAN
+void adds_imm(uint32_t instr); // FUNCIONAN
+void adds_ext(uint32_t instr); // FUNCIONAN
+void subs_imm(uint32_t instr); // FUNCIONAN
+void subs_ext(uint32_t instr); // FUNCIONAN
+void ands(uint32_t instr); // FUNCIONAN
+void eors(uint32_t instr); // FUNCIONAN
 
 
-void orr(uint32_t instr);
-void b(uint32_t instr);
-void br(uint32_t instr);
-void beq(uint32_t instr);
-void bne(uint32_t instr);
-void bgt(uint32_t instr);
-void bge(uint32_t instr);
-void blt(uint32_t instr);
-void ble(uint32_t instr);
-void bcond(uint32_t instr);
+void orr(uint32_t instr); // FUNCIONAN
+void b(uint32_t instr); //revisar
+void br(uint32_t instr); //revisar
+void beq(uint32_t instr); //revisar
+void bne(uint32_t instr); //revisar
+void bgt(uint32_t instr); //revisar
+void bge(uint32_t instr); //revisar
+void blt(uint32_t instr); //revisar
+void ble(uint32_t instr); //revisar
+void bcond(uint32_t instr); //revisar
 
-void movz(uint32_t instr);
+void movz(uint32_t instr); // FUNCIONAN
 
-void cbz(uint32_t instr);
-void cbnz(uint32_t instr);
-void mul(uint32_t instr);
+void cbz(uint32_t instr); //revisar
+void cbnz(uint32_t instr); //No funca
+void mul(uint32_t instr); //No la llegue a probar, arreglar porimero cbnz
 
 
-void lsl(uint32_t instr);
-void lsr(uint32_t instr);
-void shifts(uint32_t instr);
-void stur(uint32_t instr);
-void sturb(uint32_t instr);
-void sturh(uint32_t instr);
-void ldur(uint32_t instr);
-void ldurb(uint32_t instr);
-void ldurh(uint32_t instr);
-void mov(uint32_t instr);
+void lsl(uint32_t instr); // FUNCIONAN
+void lsr(uint32_t instr); // FUNCIONAN
+void shifts(uint32_t instr); // FUNCIONAN
+void stur(uint32_t instr); // FUNCIONAN
+void sturb(uint32_t instr); // FUNCIONAN
+void sturh(uint32_t instr); // FUNCIONAN
+void ldur(uint32_t instr); // FUNCIONAN
+void ldurb(uint32_t instr); // FUNCIONAN
+void ldurh(uint32_t instr); // FUNCIONAN
+void mov(uint32_t instr); // FUNCIONAN
 
 
 

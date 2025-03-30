@@ -14,7 +14,7 @@
     cbnz X6, loop_start  // Si X6 no es cero, salta a loop_start
 
 loop_start:
-    sub  X6, X6, 1       // Resta 1 a X6
+    subs  X6, X6, 1       // Resta 1 a X6
     cbnz X6, loop_start  // Si X6 no es cero, sigue en el bucle
 
     mov  X7, 6           // Carga valores para la multiplicación

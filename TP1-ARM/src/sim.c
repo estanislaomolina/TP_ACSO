@@ -11,26 +11,26 @@
 
 const instruction_t instructions_list[] = {
     
-    {hlt, 0b11010100, 8},
-    {adds_imm, 0b10110001, 8},
-    {adds_ext, 0b10101011, 8},
-    {subs_imm, 0b11110001, 8},
-    {subs_ext, 0b11101011, 8},
-    {ands, 0b11101010, 8},
-    {eors, 0b11001010, 8},
-    {orr, 0b10101010, 8},
-    {b, 0b00010111, 8},
-    {bcond, 0b01010100, 8},
-    {stur, 0b1111100000, 10},
-    {sturb, 0b0011100000 , 10},
-    {sturh, 0b0111100000, 10},
-    {ldur, 0b1111100001, 10},
-    {ldurb, 0b00111000, 8},
-    {ldurh, 0b0111100001, 10},
-    {shifts, 0b11010011, 8},
-    {mov, 0b11010010, 8},
-    {cbz, 0b10110100, 8},
-    {cbnz, 0b101101, 8},
+    {hlt, 0b11010100, 8}, //FUNCAN BIEN
+    {adds_imm, 0b10110001, 8}, //FUNCAN BIEN
+    {adds_ext, 0b10101011, 8}, //FUNCAN BIEN
+    {subs_imm, 0b11110001, 8}, //FUNCAN BIEN
+    {subs_ext, 0b11101011, 8}, //FUNCAN BIEN
+    {ands, 0b11101010, 8}, //FUNCAN BIEN
+    {eors, 0b11001010, 8}, //FUNCAN BIEN
+    {orr, 0b10101010, 8}, //FUNCAN BIEN
+    {b, 0b00010111, 8},  // REVISAR
+    {bcond, 0b01010100, 8},  // REVISAR
+    {stur, 0b1111100000, 10}, //FUNCAN BIEN
+    {sturb, 0b0011100000 , 10}, //FUNCAN BIEN
+    {sturh, 0b0111100000, 10}, //FUNCAN BIEN
+    {ldur, 0b1111100001, 10}, //FUNCAN BIEN
+    {ldurb, 0b00111000, 8}, //FUNCAN BIEN
+    {ldurh, 0b0111100001, 10}, //FUNCAN BIEN
+    {shifts, 0b11010011, 8}, //FUNCAN BIEN
+    {mov, 0b11010010, 8}, //FUNCAN BIEN
+    {cbz, 0b10110100, 8}, // REVISAR
+    {cbnz, 0b10110101, 8}, // REVISAR
 };
 
 
