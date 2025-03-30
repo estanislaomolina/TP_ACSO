@@ -305,17 +305,17 @@ void lsl(uint32_t instr) {
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
 
 }
-void shifts(uint32_t instruction){
+void shifts(uint32_t instr){
     printf("Shifts function enter\n");
-    uint32_t rd = get_bits(instruction, 0, 4);
-    uint32_t rn = get_bits(instruction, 5, 9);
-    uint32_t imms = get_bits(instruction, 10, 15); 
-    uint32_t immr = get_bits(instruction, 16, 21); 
+    uint32_t rd = extract_bits(instr, 0, 4);
+    uint32_t rn =extract_bits(instr, 5, 9);
+    uint32_t imms = extract_bits(instr, 10, 15); 
+    uint32_t immr = extract_bits(instr, 16, 21); 
   
     if(imms == 0b000000){
-        lsl(instruction);
+        lsl(instr);
     }else if(imms == 0b000001){
-        lsr(instruction);
+        lsr(instr);
     }else{
         printf("Unknown shift type\n");
     }
