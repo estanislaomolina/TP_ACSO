@@ -28,4 +28,9 @@ for test in "$TEST_DIR"/*.x; do
         echo "TEST $test_name FAILED ❌"
         diff "result_my_$test_name.txt" "result_sim_$test_name.txt"
     fi
+
+    # Cleanup temporary files
+    rm -f "output_my_$test_name.txt" "output_sim_$test_name.txt" \
+          "result_my_$test_name.txt" "result_sim_$test_name.txt"
+
 done
