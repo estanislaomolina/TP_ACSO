@@ -39,24 +39,4 @@ run_k_n: sim
 
 
 run_server_all: sim
-	@if [ ! -d "../inputs/bytecodes" ]; then echo "Error: Test directory '../inputs/bytecodes' not found!"; exit 1; fi
-	for test in ../inputs/bytecodes/*.x; do \
-		test_name=$$(basename $$test .x); \
-		echo "Running test: $$test_name"; \
-		\
-		# Run my simulator
-		echo -e "go\nrdump\nmdump 0x10000000 0x10100000\nquit" | ./sim $$test > output_my_$$test_name.txt; \
-		grep -E "rdump|mdump 0x10000000 0x10100000" output_my_$$test_name.txt > result_my_$$test_name.txt; \
-		\
-		# Run reference simulator
-		echo -e "go\nrdump\nmdump 0x10000000 0x10100000\nquit" | ../ref_sim_x86 $$test > output_sim_$$test_name.txt; \
-		grep -E "rdump|mdump 0x10000000 0x10100000" output_sim_$$test_name.txt > result_sim_$$test_name.txt; \
-		\
-		# Compare outputs
-		if diff result_my_$$test_name.txt result_sim_$$test_name.txt > /dev/null; then \
-			echo "TEST $$test_name PASSED ✅"; \
-		else \
-			echo "TEST $$test_name FAILED ❌"; \
-			diff result_my_$$test_name.txt result_sim_$$test_name.txt; \
-		fi; \
-	done
+	./run_all_tests.sh
