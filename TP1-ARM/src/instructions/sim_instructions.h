@@ -15,6 +15,7 @@ void eors(uint32_t instr); // FUNCIONAN
 void orr(uint32_t instr); // FUNCIONAN
 void b(uint32_t instr); //revisar
 void br(uint32_t instr); //revisar
+void cmp(uint32_t instr); //revisar
 void beq(uint32_t instr); //revisar
 void bne(uint32_t instr); //revisar
 void bgt(uint32_t instr); //revisar
