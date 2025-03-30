@@ -420,13 +420,28 @@ void ldurb(uint32_t instr) {
 
 void ldurh(uint32_t instr) {
     // Extract fields from instruction
-    uint8_t rt = (instr >> 0) & 0x1F;   // Register to load
+    uint8_t rt = (instr >> 0) & 0x1F;   // Destination register
     uint8_t rn = (instr >> 5) & 0x1F;   // Base register
     uint16_t imm12 = (instr >> 10) & 0xFFF;  // 12-bit immediate offset
 
     uint64_t address = CURRENT_STATE.REGS[rn] + imm12;
-    mem_write_32(address, CURRENT_STATE.REGS[rt]);
+
+    // Read 32-bit value from memory
+    uint32_t word = mem_read_32(address & ~0x3);  // Align address to 4 bytes
+    uint16_t value;
+
+    // Extract the correct halfword based on the byte offset
+    if (address & 0x2) {
+        value = (word >> 16) & 0xFFFF;  // Upper 16 bits
+    } else {
+        value = word & 0xFFFF;  // Lower 16 bits
+    }
+
+    // Store zero-extended 16-bit value in the register
+    NEXT_STATE.REGS[rt] = (uint64_t)value;
 }
+
+
 
 void mov(uint32_t instr) {
     // Extract the 5-bit destination register (rd)
