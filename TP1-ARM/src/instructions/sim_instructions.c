@@ -220,7 +220,6 @@ void beq(uint32_t instr) {
 
 void bne(uint32_t instr) {
     // Branch if Not Equal (FLAG_Z == 0)
-    printf("BNE: Branching to %d\n", CURRENT_STATE.PC);
     int32_t imm19 = sign_extend(extract_bits(instr, 5, 23),19);  // Extract 19-bit immediate
     int32_t offset = imm19 << 2;             // Shift left by 2
     if (!(CURRENT_STATE.FLAG_Z)) {         // Check Zero flag
@@ -235,12 +234,10 @@ void bne(uint32_t instr) {
 void bgt(uint32_t instr) {
 
     // Branch if Greater Than (FLAG_Z == 0 && FLAG_N == 0)
-    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
-    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
-        imm19 |= 0xFFF80000;
-    }
+    int32_t imm19 = sign_extend(extract_bits(instr, 5, 23),19);  // Extract 19-bit immediate
     int32_t offset = imm19 << 2;             // Shift left by 2
     if (CURRENT_STATE.FLAG_Z == 0 && CURRENT_STATE.FLAG_N == 0) {  // Check flags
+        printf("BGT: Branching to %d\n", CURRENT_STATE.PC + offset - 4);
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
     } else {
         NEXT_STATE.PC = CURRENT_STATE.PC;
@@ -249,10 +246,7 @@ void bgt(uint32_t instr) {
 
 void blt(uint32_t instr) {
     // Branch if Less Than (FLAG_N == 1)
-    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
-    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
-        imm19 |= 0xFFF80000;
-    }
+    int32_t imm19 = sign_extend(extract_bits(instr, 5, 23),19);  // Extract 19-bit immediate
     int32_t offset = imm19 << 2;             // Shift left by 2
     if (CURRENT_STATE.FLAG_N == 1) {         // Check Negative flag
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
@@ -263,10 +257,7 @@ void blt(uint32_t instr) {
 
 void bge(uint32_t instr) {
     // Branch if Greater or Equal (FLAG_N == 0)
-    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
-    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
-        imm19 |= 0xFFF80000;
-    }
+    int32_t imm19 = sign_extend(extract_bits(instr, 5, 23),19);  // Extract 19-bit immediate
     int32_t offset = imm19 << 2;             // Shift left by 2
     if (CURRENT_STATE.FLAG_N == 0) {         // Check Negative flag
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
@@ -277,10 +268,7 @@ void bge(uint32_t instr) {
 
 void ble(uint32_t instr) {
     // Branch if Less or Equal (FLAG_Z == 1 || FLAG_N == 1)
-    int32_t imm19 = (instr >> 5) & 0x7FFFF;  // Extract 19-bit immediate
-    if (imm19 & (1 << 18)) {                 // Sign-extend if needed
-        imm19 |= 0xFFF80000;
-    }
+    int32_t imm19 = sign_extend(extract_bits(instr, 5, 23),19);  // Extract 19-bit immediate
     int32_t offset = imm19 << 2;             // Shift left by 2
     if (CURRENT_STATE.FLAG_Z == 1 || CURRENT_STATE.FLAG_N == 1) {  // Check flags
         NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
@@ -291,37 +279,30 @@ void ble(uint32_t instr) {
 
 void bcond(uint32_t instr){
     // Extraer los campos de la instrucción
-    uint8_t cond = (instr >> 0) & 0xF;  // Condición de salto
-    uint8_t imm19 = (instr >> 5) & 0x7FFFF;  // Inmediato de 19 bits
-
-    // Calcular la dirección de salto
-    uint64_t offset = imm19 << 2;
-    uint64_t target = CURRENT_STATE.PC + offset;
+    uint8_t cond = extract_bits(instr, 0, 3);  // Condición (bits [3:0])
 
     // Saltar a la dirección si se cumple la condición
     // Los valores de cond representan los bits [3:0] de la instrucción
+    printf("Condition:");
+    print_binary(cond);
+    printf("\n");
 
     if (cond == 0b0000) {  // BEQ
         beq(instr);
     } else if (cond == 0b0001) {  // BNE
         bne(instr);
-    } else if (cond == 0b1010) {  // BGT
+    } else if (cond == 0b1100) {  // BGT
         bgt(instr);
-    } else if (cond == 0b1011) {  // BLT
+    } else if (cond == 0b1010) {  // BLT
         bge(instr);
-    } else if (cond == 0b1100) {  // BGE
+    } else if (cond == 0b1011) {  // BGE
         blt(instr);
     } else if (cond == 0b1101) {  // BLE
         ble(instr);
-  
     } else {
         printf("Unknown condition: ");
         hlt();
     }
-
-    // Saltar a la dirección
-    //NEXT_STATE.PC = target;
-    
 }
 
 
@@ -353,7 +334,6 @@ void lsl(uint32_t instr) {
     NEXT_STATE.FLAG_N = (result<0);
     NEXT_STATE.FLAG_Z = (result == 0) ? 1 : 0;  // Flag de cero
     NEXT_STATE.PC = CURRENT_STATE.PC;
-
 }
 
 void lsr(uint32_t instr) {
@@ -465,7 +445,6 @@ void ldurb(uint32_t instr) {
 
 
     uint32_t address = CURRENT_STATE.REGS[rn] + imm9;
-
     
     uint64_t values = mem_read_32(address);
     values = values & 0xFF;

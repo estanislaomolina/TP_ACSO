@@ -15,14 +15,14 @@ void eors(uint32_t instr); // FUNCIONAN
 void orr(uint32_t instr); // FUNCIONAN
 void b(uint32_t instr); //revisar
 void br(uint32_t instr); //revisar
-void cmp(uint32_t instr); //revisar
-void beq(uint32_t instr); //revisar
-void bne(uint32_t instr); //revisar
-void bgt(uint32_t instr); //revisar
-void bge(uint32_t instr); //revisar
-void blt(uint32_t instr); //revisar
-void ble(uint32_t instr); //revisar
-void bcond(uint32_t instr); //revisar
+void cmp(uint32_t instr); //FUNCIONAN
+void beq(uint32_t instr); //FUNCIONAN
+void bne(uint32_t instr); //FUNCIONAN
+void bgt(uint32_t instr); //FUNCIONAN
+void bge(uint32_t instr); //FUNCIONAN
+void blt(uint32_t instr); //FUNCIONAN
+void ble(uint32_t instr); //FUNCIONAN
+void bcond(uint32_t instr); //FUNCIONAN
 
 void movz(uint32_t instr); // FUNCIONAN
 
