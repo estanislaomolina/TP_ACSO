@@ -1,0 +1,11 @@
+ADD X0, X0, 0X4
+LSL X0, X0, 20
+ADD X0, X0, 24
+BR X0
+B label1
+ADD X1, X2, 1
+HLT 0
+
+label1:
+ADD X2,X3,1
+HLT 0

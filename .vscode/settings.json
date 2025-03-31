@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "conditional_instructions.h": "c",
+        "stdint.h": "c",
+        "utils.h": "c",
+        "sim_instructions.h": "c",
+        "stdio.h": "c",
+        "shell.h": "c",
+        "assert.h": "c"
+    }
+}
