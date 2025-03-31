@@ -1,19 +1,19 @@
 
 Current register/bus values :
 -------------------------------------
-Instruction Count : 5
-PC                : 0x40001c
+Instruction Count : 23
+PC                : 0x40003c
 Registers:
-X0: 0x400018
-X1: 0x0
-X2: 0x0
-X3: 0x0
-X4: 0x0
-X5: 0x0
+X0: 0x0
+X1: 0xffff0000
+X2: 0xffff00
+X3: 0x10000000
+X4: 0xabcd
+X5: 0xabcd
 X6: 0x0
-X7: 0x0
-X8: 0x0
-X9: 0x0
+X7: 0x6
+X8: 0x7
+X9: 0x2a
 X10: 0x0
 X11: 0x0
 X12: 0x0
@@ -37,12 +37,5 @@ X29: 0x0
 X30: 0x0
 X31: 0x0
 FLAG_N: 0
-FLAG_Z: 0
-
-
-Memory content [0x10000000..0x10000008] :
--------------------------------------
-  0x10000000 (268435456) : 0x0
-  0x10000004 (268435460) : 0x0
-  0x10000008 (268435464) : 0x0
+FLAG_Z: 1
 

@@ -160,15 +160,15 @@ void orr(uint32_t instr)
 // Unconditional branch
 void b(uint32_t instr)
 {
-    int32_t imm26 = sign_extend(extract_bits(instr, 5, 31), 26); // Immediate offset
-    int32_t offset = imm26 << 2;                                 // Convert to byte offset
+    int32_t imm26 = sign_extend(extract_bits(instr, 0, 25), 26); // Immediate offset
+    int32_t offset =  imm26 << 2;           // Convert to byte offset
     NEXT_STATE.PC = CURRENT_STATE.PC + offset - 4;
 }
 
 // Branch to address in register
 void br(uint32_t instr)
 {
-    uint8_t rn = (instr >> 5) & 0x1F; // Register containing target address
+    uint8_t rn = extract_bits(instr, 5, 9); // Register containing target address
     uint64_t target_address = CURRENT_STATE.REGS[rn];
     NEXT_STATE.PC = target_address - 4;
 }
