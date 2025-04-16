@@ -1,0 +1,25 @@
+Para defusar la fase 1 de la bomba, lo primero que hice fue colocar un breakpoint en la dirección de la función phase_1, que se encuentra en 0x401de7. 
+Esto me permitió detener la ejecución del programa justo cuando llegamos a la fase 1.
+Al hacer esto, pude inspeccionar la memoria en la dirección 0x4c9a58, utilizando el comando 'x/s 0x4c9a58'. 
+Esto mostró el string que el programa usa para comparar la entrada del usuario. 
+El string en esa dirección era:
+"He conocido, aunque tarde, sin haberme arrepentido, que es pecado cometido el decir ciertas verdades"
+Esto significaba que, para que no explote la bomba, tengo que ingresar exactamente esa misma frase. 
+Al ingresar esta frase de manera correcta, el programa no ejecutaba la función que hace explotar la bomba, pudiendo pasar a la fase 2.
+
+En la fase 2, el objetivo es encontrar dos números específicos, num1 y num2, que deben cumplir con ciertas condiciones. 
+Lo primero que hice fue identificar que la suma de ambos números debe ser igual a x + 0x20, donde x es un valor con exactamente 11 bits en 1. 
+Este valor de x es crucial y se genera a partir de una máscara de bits. 
+Calcule el valor de la suma de num1 + num2 para cada posible valor de x que cumple esta condición.
+Luego, para cada posible x, inetnte varios valores de num1 y calculamos num2 como la diferencia entre la suma deseada (x + 0x20) y el valor de num1. 
+Después, me fije que el resultado de num1 XOR num2 sea negativo, lo que es otro requerimiento para que la bomba no explote.
+Con fase2.py halle un par de valores para num1 y num2 que cumplen ambas condiciones, asegurándonos de que la bomba no se active.
+
+En la fase 3 de la bomba, el objetivo era ingresar una palabra y un número, de modo que se realizara una búsqueda binaria sobre un arreglo de palabras cargado en memoria. 
+La bomba solo se desactiva si la cantidad de comparaciones hechas durante esa búsqueda binaria está entre 7 y 11 inclusive.
+Para resolverla, primero me fije como funcionaba la búsqueda binaria y descubrimos que la cantidad de comparaciones depende de la posición de la palabra dentro del archivo palabras.txt.
+Tuve un problema que no era suficiente con ingresar cualquier palabra existente en el archivo.
+Tenia que ser una cuya posición provocara exactamente entre 7 y 11 comparaciones. 
+Para eso, arme fase3.py que simula la búsqueda binaria y cuenta las comparaciones necesarias para cada palabra del archivo.
+Gracias a esto, cosnegui un input válido para desactivar la bomba, "abajar".
+Este input fue aceptado porque la palabra “abajar” se encontraba en una posición tal que la búsqueda binaria tardaba exactamente 11 comparaciones en encontrarla.
