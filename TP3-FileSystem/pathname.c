@@ -6,8 +6,10 @@
 #include <string.h>
 #include <assert.h>
 
-int pathname_lookup(struct unixfilesystem *fs, const char *pathname) {
-    if (pathname[0] != '/') return -1;
+int pathname_lookup(struct unixfilesystem *fs, const char *pathname)
+{
+    if (pathname[0] != '/')
+        return -1;
 
     int inum = 1;
     char pathcopy[1024];
@@ -15,9 +17,11 @@ int pathname_lookup(struct unixfilesystem *fs, const char *pathname) {
     pathcopy[sizeof(pathcopy) - 1] = '\0';
 
     char *token = strtok(pathcopy, "/");
-    while (token != NULL) {
+    while (token != NULL)
+    {
         struct direntv6 dirEnt;
-        if (directory_findname(fs, token, inum, &dirEnt) < 0) {
+        if (directory_findname(fs, token, inum, &dirEnt) < 0)
+        {
             return -1;
         }
         inum = dirEnt.d_inumber;
