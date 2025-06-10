@@ -6,6 +6,7 @@
         "sim_instructions.h": "c",
         "stdio.h": "c",
         "shell.h": "c",
-        "assert.h": "c"
+        "assert.h": "c",
+        "stdlib.h": "c"
     }
 }
