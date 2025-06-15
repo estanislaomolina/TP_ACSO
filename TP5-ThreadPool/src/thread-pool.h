@@ -15,6 +15,8 @@
 #include <thread>      // for thread
 #include <vector>      // for vector
 #include "Semaphore.h" // for Semaphore
+#include <queue>       // para queue
+#include <mutex>       // para mutex
 
 using namespace std;
 
@@ -34,6 +36,9 @@ typedef struct worker {
     /**
      * Complete the definition of the worker_t struct here...
      **/
+    Semaphore sem{0}; // señal para despertar al worker. esta con "{0}" para poder inicializarlo con ese valor.
+    bool available = true; // marca si el worker está libre
+    int idWorker = -1; // identificador del worker
 } worker_t;
 
 class ThreadPool {
@@ -78,6 +83,15 @@ class ThreadPool {
     /* It is incomplete, there should be more private variables to manage the structures... 
     * *
     */
+   queue<function<void(void)>> tareas; // queue de tareas a ejecutar
+   Semaphore tareas_disponibles{0}; // semaphore para indicar cuantas tareas hay
+
+   queue<int> idWorker; // queue de workers disponibles segun su id
+   Semaphore idWorker_disponibles{0}; // semaphore para indicar cuantas workers hay
+
+   mutex idWorkerLock; // mutex para proteger el acceso a la queue de workers disponibles
+ 
+ 
   
     /* ThreadPools are the type of thing that shouldn't be cloneable, since it's
     * not clear what it means to clone a ThreadPool (should copies of all outstanding
