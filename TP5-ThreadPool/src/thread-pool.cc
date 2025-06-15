@@ -25,7 +25,18 @@ ThreadPool::ThreadPool(size_t numThreads) : wts(numThreads), done(false) {
 void ThreadPool::schedule(const function<void(void)>& thunk) {
     // Programa el thunk proporcionado para ser ejecutado por alguno de los hilos del ThreadPool
     // tan pronto como todos los thunks previamente programados hayan sido manejados.
-    return;
+    {
+        std::lock_guard<mutex> lock(queueLock); // bloqueo el mutex para proteger el acceso a la queue de tareas
+        tareas.push(thunk); // agrego el thunk a la queue de tareas
+    }
+
+    tareas_disponibles.signal(); // incremento el semaphore de tareas disponibles
+    {
+        std::lock_guard<mutex> lock(idWorkerLock); // bloqueo el mutex para proteger el acceso a la queue de workers disponibles
+        if (!idWorker.empty()) {
+            idWorker_disponibles.signal(); // incremento el semaphore de workers disponibles
+        }
+    }
 }
 
 void ThreadPool::wait() {
