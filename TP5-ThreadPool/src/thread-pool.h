@@ -17,6 +17,7 @@
 #include "Semaphore.h" // for Semaphore
 #include <queue>       // para queue
 #include <mutex>       // para mutex
+#include <condition_variable>  // para wait()
 
 using namespace std;
 
@@ -90,10 +91,14 @@ class ThreadPool {
    Semaphore idWorker_disponibles{0}; // semaphore para indicar cuantas workers hay
 
    mutex idWorkerLock; // mutex para proteger el acceso a la queue de workers disponibles
- 
- 
-  
-    /* ThreadPools are the type of thing that shouldn't be cloneable, since it's
+
+   // para wait()
+   mutex completionMutex; // mutex para proteger el acceso a las variables de finalización
+   condition_variable completionCv; // espera a que todos terminen
+   size_t totalTareas = 0; // cuantas tareas se han scheduleado
+   size_t tareasCompletadas = 0; // cuantas ya finalizaron
+
+   /* ThreadPools are the type of thing that shouldn't be cloneable, since it's
     * not clear what it means to clone a ThreadPool (should copies of all outstanding
     * functions to be executed be copied?).
     *

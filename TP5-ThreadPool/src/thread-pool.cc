@@ -30,18 +30,19 @@ void ThreadPool::schedule(const function<void(void)>& thunk) {
         tareas.push(thunk); // agrego el thunk a la queue de tareas
     }
 
-    tareas_disponibles.signal(); // incremento el semaphore de tareas disponibles
     {
-        std::lock_guard<mutex> lock(idWorkerLock); // bloqueo el mutex para proteger el acceso a la queue de workers disponibles
-        if (!idWorker.empty()) {
-            idWorker_disponibles.signal(); // incremento el semaphore de workers disponibles
-        }
+    std::lock_guard<mutex> lock(completionMutex); // bloqueo el mutex para proteger el acceso a las variables de finalización
+    totalTareas++; // incremento el contador de tareas totales
     }
+    tareas_disponibles.signal(); // incremento el semaphore de tareas disponibles
 }
 
 void ThreadPool::wait() {
     // Bloquea y espera hasta que todos los thunks previamente programados hayan sido ejecutados completamente
-    return;
+    std::unique_lock<std::mutex> lock(completionMutex); // bloqueo el mutex para proteger el acceso a las variables de finalización
+    completionCv.wait(lock, [this]() { // 
+      return tareasCompletadas == totalTareas;
+    });
 }
 
 void ThreadPool::worker(int id){
